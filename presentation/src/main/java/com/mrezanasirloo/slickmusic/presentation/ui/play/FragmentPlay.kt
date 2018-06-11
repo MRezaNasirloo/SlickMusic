@@ -40,8 +40,6 @@ class FragmentPlay : Fragment(), ViewPlay {
     @Presenter
     lateinit var presenterPlay: PresenterPlay
 
-    private val requestPermission: PublishSubject<Any> = PublishSubject.create()
-
     companion object {
 
         fun newInstance(): FragmentPlay = FragmentPlay()
@@ -75,24 +73,6 @@ class FragmentPlay : Fragment(), ViewPlay {
 
     override fun showError(error: Throwable) {
         Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
-    }
-
-    override fun showRationalSettingPage() {
-        adapter.clear()
-        adapter.add(ItemPermissionDenied(getString(R.string.message_go_to_settings), View.OnClickListener {
-            context?.openAppSettingPage()
-        }))
-    }
-
-    override fun showRational() {
-        adapter.clear()
-        adapter.add(ItemPermissionDenied(getString(R.string.message_grant_read_permission), View.OnClickListener {
-            requestPermission.onNext(1)
-        }))
-    }
-
-    override fun commandPermission(): Observable<Any> {
-        return requestPermission
     }
 
 }

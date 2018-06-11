@@ -10,8 +10,4 @@ import io.reactivex.Observable
 interface ViewPlay {
     fun update(list: List<Item>)
     fun showError(error: Throwable)
-    fun showRationalSettingPage()
-    fun showRational()
-
-    fun commandPermission() : Observable<Any>
 }
