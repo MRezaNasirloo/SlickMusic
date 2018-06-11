@@ -52,9 +52,7 @@ class FragmentPlay : Fragment(), ViewPlay {
         PresenterPlay_Slick.bind(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_play, container, false)
     }
 
@@ -62,9 +60,9 @@ class FragmentPlay : Fragment(), ViewPlay {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        list.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL))
-        list.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         list.adapter = adapter
+        list.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        list.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL))
     }
 
     override fun update(list: List<Item>) {

@@ -1,9 +1,14 @@
 package com.mrezanasirloo.slickmusic.presentation.ui.main
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.widget.Button
+import android.util.Log
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import com.mrezanasirloo.slick.Presenter
 import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.App
@@ -11,7 +16,9 @@ import com.mrezanasirloo.slickmusic.presentation.openAppSettingPage
 import com.mrezanasirloo.slickmusic.presentation.ui.play.FragmentPlay
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.row_error_rational.*
+import kotlinx.android.synthetic.main.row_error_rational.view.*
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -26,30 +33,46 @@ class ActivityMain : AppCompatActivity(), ViewMain {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
         App.componentMain().inject(this)
         PresenterMain_Slick.bind(this)
     }
 
+    override fun onResume() {
+        super.onResume()
+        // TODO: 2018-06-11 Remove logic from view
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED)
+            requestPermission.onNext(1)
+    }
+
     override fun showPages() {
-        setContentView(R.layout.activity_main)
+        println("ActivityMain.showPages")
+        permission_view.visibility = INVISIBLE
+        navigation.visibility = VISIBLE
+        container.visibility = VISIBLE
         val tag = FragmentPlay::class.java.simpleName
         val fm = supportFragmentManager
         if (fm.findFragmentByTag(tag) == null) {
             fm.beginTransaction()
                     .replace(R.id.container, FragmentPlay.newInstance(), tag)
-                    .commit()
+                    .commitNow()
         }
     }
 
     override fun showError(error: Throwable) {
+        println("ActivityMain.showError")
         error.message?.let {
             Snackbar.make(window.decorView, it, Snackbar.LENGTH_LONG).show()
         }
     }
 
     override fun showRationalSettingPage() {
-        setContentView(R.layout.row_error_rational)
-        val button = findViewById<Button>(R.id.button_grant)
+        println("ActivityMain.showRationalSettingPage")
+        val button = permission_view.button_grant
+        container.visibility = INVISIBLE
+        navigation.visibility = INVISIBLE
+        permission_view.visibility = VISIBLE
         button.setText(R.string.message_go_to_settings)
         button_grant.setOnClickListener {
             openAppSettingPage()
@@ -57,8 +80,11 @@ class ActivityMain : AppCompatActivity(), ViewMain {
     }
 
     override fun showRational() {
-        setContentView(R.layout.row_error_rational)
-        val button = findViewById<Button>(R.id.button_grant)
+        println("ActivityMain.showRational")
+        val button = permission_view.button_grant
+        container.visibility = INVISIBLE
+        navigation.visibility = INVISIBLE
+        permission_view.visibility = VISIBLE
         button.setText(R.string.message_grant_read_permission)
         button.setOnClickListener {
             requestPermission.onNext(1)

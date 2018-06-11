@@ -29,11 +29,13 @@ class PresenterMain @Inject constructor(
     override fun render(state: StateMain, view: ViewMain) {
         println("state = [${state}], view = [${view}]")
         view.apply {
-            if (state.permissionRequested) when (state.permissionState) {
-                Permission.State.GRANTED -> showPages()
-                Permission.State.DENIED -> showRational()
-                Permission.State.DENIED_NOT_SHOWN -> showRationalSettingPage()
-                Permission.State.REVOKED_BY_POLICY -> showError(Throwable("REVOKED_BY_POLICY"))
+            if (state.permissionRequested) {
+                when (state.permissionState) {
+                    Permission.State.GRANTED -> showPages()
+                    Permission.State.DENIED -> showRational()
+                    Permission.State.DENIED_NOT_SHOWN -> showRationalSettingPage()
+                    Permission.State.REVOKED_BY_POLICY -> showError(Throwable("REVOKED_BY_POLICY"))
+                }
             }
             state.error?.let {
                 //TODO Handle errors here

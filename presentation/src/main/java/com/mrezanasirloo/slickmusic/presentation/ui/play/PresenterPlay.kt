@@ -34,7 +34,7 @@ class PresenterPlay @Inject constructor(
     }
 
     override fun render(state: StatePlay, view: ViewPlay) {
-        println("state = [$state], view = [$view]")
+        println("list = [${state.list.size}], error = [${state.error}] view = [$view]")
         view.apply {
             view.update(state.list)
             state.error?.let {
