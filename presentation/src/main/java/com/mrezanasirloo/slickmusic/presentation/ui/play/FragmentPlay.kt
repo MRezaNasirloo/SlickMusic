@@ -17,6 +17,7 @@ import com.mrezanasirloo.slick.Presenter
 import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.App
 import com.mrezanasirloo.slickmusic.presentation.openAppSettingPage
+import com.mrezanasirloo.slickmusic.presentation.ui.main.BackStackFragment
 import com.mrezanasirloo.slickmusic.presentation.ui.play.item.ItemPermissionDenied
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.Item
@@ -33,9 +34,10 @@ import javax.inject.Provider
  * Use the [FragmentPlay.newInstance] factory method to
  * create an instance of this fragment.
  */
-class FragmentPlay : Fragment(), ViewPlay {
+class FragmentPlay : BackStackFragment(), ViewPlay {
     @Inject
     lateinit var provider: Provider<PresenterPlay>
+
 
     @Presenter
     lateinit var presenterPlay: PresenterPlay

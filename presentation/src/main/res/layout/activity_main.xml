@@ -8,10 +8,11 @@
     tools:context="com.mrezanasirloo.slickmusic.presentation.ui.main.ActivityMain"
     >
 
-    <FrameLayout
-        android:id="@+id/container"
+    <com.mrezanasirloo.slickmusic.presentation.ui.main.ViewPagerNoTouch
+        android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="56dp"
         />
 
     <include

@@ -3,10 +3,14 @@ package com.mrezanasirloo.slickmusic.presentation.ui.main
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.Snackbar
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
+import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
+import android.view.MenuItem
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import com.mrezanasirloo.slick.Presenter
@@ -51,14 +55,10 @@ class ActivityMain : AppCompatActivity(), ViewMain {
         println("ActivityMain.showPages")
         permission_view.visibility = INVISIBLE
         navigation.visibility = VISIBLE
-        container.visibility = VISIBLE
-        val tag = FragmentPlay::class.java.simpleName
-        val fm = supportFragmentManager
-        if (fm.findFragmentByTag(tag) == null) {
-            fm.beginTransaction()
-                    .replace(R.id.container, FragmentAlbum.newInstance(), tag)
-                    .commitNow()
-        }
+        view_pager.visibility = VISIBLE
+        view_pager.offscreenPageLimit = 2
+        view_pager.adapter = Pager(supportFragmentManager)
+        navigation.setOnNavigationItemSelectedListener(BottomNavListener())
     }
 
     override fun showError(error: Throwable) {
@@ -72,7 +72,7 @@ class ActivityMain : AppCompatActivity(), ViewMain {
     override fun showRationalSettingPage() {
         println("ActivityMain.showRationalSettingPage")
         val button = permission_view.button_grant
-        container.visibility = INVISIBLE
+        view_pager.visibility = INVISIBLE
         navigation.visibility = INVISIBLE
         permission_view.visibility = VISIBLE
         button.setText(R.string.message_go_to_settings)
@@ -84,7 +84,7 @@ class ActivityMain : AppCompatActivity(), ViewMain {
     override fun showRational() {
         println("ActivityMain.showRational")
         val button = permission_view.button_grant
-        container.visibility = INVISIBLE
+        view_pager.visibility = INVISIBLE
         navigation.visibility = INVISIBLE
         permission_view.visibility = VISIBLE
         button.setText(R.string.message_grant_read_permission)
@@ -96,4 +96,46 @@ class ActivityMain : AppCompatActivity(), ViewMain {
     override fun commandPermission(): Observable<Any> {
         return requestPermission
     }
+
+    override fun onBackPressed() {
+        if (BackStackFragment.handleBackPressed(supportFragmentManager)) return
+        super.onBackPressed()
+
+    }
+
+    inner class BottomNavListener : BottomNavigationView.OnNavigationItemSelectedListener {
+        override fun onNavigationItemSelected(item: MenuItem): Boolean {
+            return when (item.itemId) {
+                R.id.navigation_album -> {
+                    view_pager.currentItem = 0
+                    true
+                }
+                R.id.navigation_songs -> {
+                    view_pager.currentItem = 1
+                    true
+                }
+                R.id.navigation_favorite -> {
+                    view_pager.currentItem = 3
+                    true
+                }
+                else -> false
+            }
+        }
+    }
 }
+
+class Pager(fm: FragmentManager?) : FragmentPagerAdapter(fm) {
+    override fun getItem(position: Int): Fragment {
+        return when (position) {
+            0 -> FragmentAlbum.newInstance()
+            1 -> FragmentPlay.newInstance()
+            2 -> TODO("FragmentFavorite Not Implemented")
+            else -> throw IllegalStateException()
+        }
+    }
+
+    override fun getCount(): Int {
+        return 2
+    }
+}
+

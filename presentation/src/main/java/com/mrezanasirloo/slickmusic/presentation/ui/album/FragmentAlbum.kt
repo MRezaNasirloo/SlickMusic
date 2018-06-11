@@ -14,6 +14,7 @@ import android.widget.Toast
 import com.mrezanasirloo.slick.Presenter
 import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.App
+import com.mrezanasirloo.slickmusic.presentation.ui.main.BackStackFragment
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.Item
 import com.xwray.groupie.kotlinandroidextensions.ViewHolder
@@ -27,7 +28,7 @@ import javax.inject.Provider
  * Use the [FragmentAlbum.newInstance] factory method to
  * create an instance of this fragment.
  */
-class FragmentAlbum : Fragment(), ViewAlbum {
+class FragmentAlbum : BackStackFragment(), ViewAlbum {
     @Inject
     lateinit var provider: Provider<PresenterAlbum>
 
