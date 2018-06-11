@@ -21,12 +21,4 @@ class ItemSongSmall(private val song: Song) : Item() {
         viewHolder.textView_no.text = song.trackNumber.toString()
     }
 
-    override fun bind(holder: ViewHolder, position: Int, payloads: MutableList<Any>, onItemClickListener: OnItemClickListener?, onItemLongClickListener: OnItemLongClickListener?) {
-        super.bind(holder, position, payloads, onItemClickListener, onItemLongClickListener)
-    }
-
-    override fun bind(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
-        super.bind(holder, position, payloads)
-    }
-
 }
