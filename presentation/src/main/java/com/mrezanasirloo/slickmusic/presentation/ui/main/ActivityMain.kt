@@ -13,6 +13,7 @@ import com.mrezanasirloo.slick.Presenter
 import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.App
 import com.mrezanasirloo.slickmusic.presentation.openAppSettingPage
+import com.mrezanasirloo.slickmusic.presentation.ui.album.FragmentAlbum
 import com.mrezanasirloo.slickmusic.presentation.ui.play.FragmentPlay
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -55,12 +56,13 @@ class ActivityMain : AppCompatActivity(), ViewMain {
         val fm = supportFragmentManager
         if (fm.findFragmentByTag(tag) == null) {
             fm.beginTransaction()
-                    .replace(R.id.container, FragmentPlay.newInstance(), tag)
+                    .replace(R.id.container, FragmentAlbum.newInstance(), tag)
                     .commitNow()
         }
     }
 
     override fun showError(error: Throwable) {
+        error.printStackTrace()
         println("ActivityMain.showError")
         error.message?.let {
             Snackbar.make(window.decorView, it, Snackbar.LENGTH_LONG).show()

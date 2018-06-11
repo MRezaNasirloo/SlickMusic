@@ -71,7 +71,7 @@ public class AlbumLoader {
                 return albumDomain;
             }
         }
-        AlbumDomain albumDomain = new AlbumDomain();
+        AlbumDomain albumDomain = new AlbumDomain(new ArrayList<>(8));
         albumDomains.add(albumDomain);
         return albumDomain;
     }
