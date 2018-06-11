@@ -1,4 +1,4 @@
-package com.mrezanasirloo.slickmusic.presentation.ui.play.model
+package com.mrezanasirloo.slickmusic.presentation.ui.song.model
 
 import com.mrezanasirloo.domain.model.SongDomain
 

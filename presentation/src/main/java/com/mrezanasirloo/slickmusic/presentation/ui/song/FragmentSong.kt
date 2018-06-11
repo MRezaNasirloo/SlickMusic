@@ -1,11 +1,7 @@
-package com.mrezanasirloo.slickmusic.presentation.ui.play
+package com.mrezanasirloo.slickmusic.presentation.ui.song
 
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.support.v4.app.Fragment
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -16,25 +12,21 @@ import android.widget.Toast
 import com.mrezanasirloo.slick.Presenter
 import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.App
-import com.mrezanasirloo.slickmusic.presentation.openAppSettingPage
 import com.mrezanasirloo.slickmusic.presentation.ui.main.BackStackFragment
-import com.mrezanasirloo.slickmusic.presentation.ui.play.item.ItemPermissionDenied
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.Item
 import com.xwray.groupie.kotlinandroidextensions.ViewHolder
-import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
-import kotlinx.android.synthetic.main.fragment_play.*
+import kotlinx.android.synthetic.main.fragment_song.*
 import javax.inject.Inject
 import javax.inject.Provider
 
 
 /**
  * A simple [Fragment] subclass.
- * Use the [FragmentPlay.newInstance] factory method to
+ * Use the [FragmentSong.newInstance] factory method to
  * create an instance of this fragment.
  */
-class FragmentPlay : BackStackFragment(), ViewPlay {
+class FragmentSong : BackStackFragment(), ViewSong {
     @Inject
     lateinit var provider: Provider<PresenterPlay>
 
@@ -44,7 +36,7 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
 
     companion object {
 
-        fun newInstance(): FragmentPlay = FragmentPlay()
+        fun newInstance(): FragmentSong = FragmentSong()
 
     }
 
@@ -55,7 +47,7 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_play, container, false)
+        return inflater.inflate(R.layout.fragment_song, container, false)
     }
 
     private val adapter: GroupAdapter<ViewHolder> = GroupAdapter()

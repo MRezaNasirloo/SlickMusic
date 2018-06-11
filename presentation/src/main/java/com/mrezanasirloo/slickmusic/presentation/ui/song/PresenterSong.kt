@@ -1,10 +1,10 @@
-package com.mrezanasirloo.slickmusic.presentation.ui.play
+package com.mrezanasirloo.slickmusic.presentation.ui.song
 
 import com.mrezanasirloo.domain.implementation.usecase.UseCaseGetAllSongImpl
 import com.mrezanasirloo.slick.uni.PartialViewState
 import com.mrezanasirloo.slick.uni.SlickPresenterUni
-import com.mrezanasirloo.slickmusic.presentation.ui.play.item.ItemSongSmall
-import com.mrezanasirloo.slickmusic.presentation.ui.play.model.Song
+import com.mrezanasirloo.slickmusic.presentation.ui.song.item.ItemSongSmall
+import com.mrezanasirloo.slickmusic.presentation.ui.song.model.Song
 import com.xwray.groupie.kotlinandroidextensions.Item
 import io.reactivex.Observable
 import io.reactivex.Scheduler
@@ -20,8 +20,8 @@ class PresenterPlay @Inject constructor(
         private val getAllSongs: UseCaseGetAllSongImpl,
         @Named("main") main: Scheduler?,
         @Named("io") io: Scheduler?
-) : SlickPresenterUni<ViewPlay, StatePlay>(main, io) {
-    override fun start(view: ViewPlay) {
+) : SlickPresenterUni<ViewSong, StatePlay>(main, io) {
+    override fun start(view: ViewSong) {
 
         @Suppress("RedundantSamConstructor")
         val list: Observable<PartialViewState<StatePlay>> = getAllSongs.execute().subscribeOn(io)
@@ -33,7 +33,7 @@ class PresenterPlay @Inject constructor(
         subscribe(StatePlay(), list)
     }
 
-    override fun render(state: StatePlay, view: ViewPlay) {
+    override fun render(state: StatePlay, view: ViewSong) {
         println("list = [${state.list.size}], error = [${state.error}] view = [$view]")
         view.apply {
             view.update(state.list)

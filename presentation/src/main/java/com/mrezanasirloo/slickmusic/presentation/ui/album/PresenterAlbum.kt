@@ -1,13 +1,10 @@
 package com.mrezanasirloo.slickmusic.presentation.ui.album
 
 import com.mrezanasirloo.domain.implementation.usecase.UseCaseGetAllAlbumImpl
-import com.mrezanasirloo.domain.usecase.UseCaseGetAllAlbums
 import com.mrezanasirloo.slick.uni.PartialViewState
 import com.mrezanasirloo.slick.uni.SlickPresenterUni
 import com.mrezanasirloo.slickmusic.presentation.ui.album.item.ItemAlbumBig
-import com.mrezanasirloo.slickmusic.presentation.ui.play.item.ItemSongSmall
-import com.mrezanasirloo.slickmusic.presentation.ui.play.model.Album
-import com.mrezanasirloo.slickmusic.presentation.ui.play.model.Song
+import com.mrezanasirloo.slickmusic.presentation.ui.song.model.Album
 import com.xwray.groupie.kotlinandroidextensions.Item
 import io.reactivex.Observable
 import io.reactivex.Scheduler

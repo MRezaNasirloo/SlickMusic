@@ -16,7 +16,7 @@ import com.mrezanasirloo.slickmusic.R;
 import com.mrezanasirloo.slickmusic.presentation.glide.audiocover.AudioFileCover;
 import com.mrezanasirloo.slickmusic.presentation.glide.palette.BitmapPaletteTransCoder;
 import com.mrezanasirloo.slickmusic.presentation.glide.palette.BitmapPaletteWrapper;
-import com.mrezanasirloo.slickmusic.presentation.ui.play.model.Song;
+import com.mrezanasirloo.slickmusic.presentation.ui.song.model.Song;
 
 /**
  * @author Karim Abou Zeid (kabouzeid)

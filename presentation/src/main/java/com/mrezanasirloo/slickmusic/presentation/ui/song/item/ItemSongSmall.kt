@@ -1,9 +1,7 @@
-package com.mrezanasirloo.slickmusic.presentation.ui.play.item
+package com.mrezanasirloo.slickmusic.presentation.ui.song.item
 
 import com.mrezanasirloo.slickmusic.R
-import com.mrezanasirloo.slickmusic.presentation.ui.play.model.Song
-import com.xwray.groupie.OnItemClickListener
-import com.xwray.groupie.OnItemLongClickListener
+import com.mrezanasirloo.slickmusic.presentation.ui.song.model.Song
 import com.xwray.groupie.kotlinandroidextensions.Item
 import com.xwray.groupie.kotlinandroidextensions.ViewHolder
 import kotlinx.android.synthetic.main.row_song_small.*

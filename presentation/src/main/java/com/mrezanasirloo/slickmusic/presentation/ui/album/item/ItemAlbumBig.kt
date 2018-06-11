@@ -5,7 +5,7 @@ import com.bumptech.glide.Glide
 import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.glide.PhonographColoredTarget
 import com.mrezanasirloo.slickmusic.presentation.glide.SongGlideRequest
-import com.mrezanasirloo.slickmusic.presentation.ui.play.model.Album
+import com.mrezanasirloo.slickmusic.presentation.ui.song.model.Album
 import com.mrezanasirloo.slickmusic.presentation.util.ColorUtil
 import com.mrezanasirloo.slickmusic.presentation.util.MaterialValueHelper
 import com.xwray.groupie.kotlinandroidextensions.Item

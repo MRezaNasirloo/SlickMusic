@@ -4,7 +4,6 @@ package com.mrezanasirloo.slickmusic.presentation.ui.album
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
@@ -18,7 +17,7 @@ import com.mrezanasirloo.slickmusic.presentation.ui.main.BackStackFragment
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.Item
 import com.xwray.groupie.kotlinandroidextensions.ViewHolder
-import kotlinx.android.synthetic.main.fragment_play.*
+import kotlinx.android.synthetic.main.fragment_song.*
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -48,7 +47,7 @@ class FragmentAlbum : BackStackFragment(), ViewAlbum {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_play, container, false)
+        return inflater.inflate(R.layout.fragment_song, container, false)
     }
 
     private val adapter: GroupAdapter<ViewHolder> = GroupAdapter()

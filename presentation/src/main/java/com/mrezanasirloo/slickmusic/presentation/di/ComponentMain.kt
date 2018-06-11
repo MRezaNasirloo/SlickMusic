@@ -2,12 +2,12 @@ package com.mrezanasirloo.slickmusic.presentation.di
 
 import com.mrezanasirloo.slickmusic.presentation.ui.main.ActivityMain
 import com.mrezanasirloo.slickmusic.presentation.ui.album.FragmentAlbum
-import com.mrezanasirloo.slickmusic.presentation.ui.play.FragmentPlay
+import com.mrezanasirloo.slickmusic.presentation.ui.song.FragmentSong
 import dagger.Subcomponent
 
 @Subcomponent(modules = [ModuleMain::class])
 interface ComponentMain {
-    fun inject(fragmentPlay: FragmentPlay)
+    fun inject(fragmentPlay: FragmentSong)
     fun inject(fragmentAlbum: FragmentAlbum)
     fun inject(activityMain: ActivityMain)
 
