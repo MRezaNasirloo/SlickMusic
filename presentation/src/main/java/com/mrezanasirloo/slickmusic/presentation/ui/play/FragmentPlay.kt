@@ -16,6 +16,7 @@ import android.widget.Toast
 import com.mrezanasirloo.slick.Presenter
 import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.App
+import com.mrezanasirloo.slickmusic.presentation.openAppSettingPage
 import com.mrezanasirloo.slickmusic.presentation.ui.play.item.ItemPermissionDenied
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.Item
@@ -78,34 +79,20 @@ class FragmentPlay : Fragment(), ViewPlay {
 
     override fun showRationalSettingPage() {
         adapter.clear()
-        adapter.add(ItemPermissionDenied("Go To Setting", View.OnClickListener {
-            startInstalledAppDetailsActivity(context)
+        adapter.add(ItemPermissionDenied(getString(R.string.message_go_to_settings), View.OnClickListener {
+            context?.openAppSettingPage()
         }))
     }
 
     override fun showRational() {
         adapter.clear()
-        adapter.add(ItemPermissionDenied("Grant Read Permission", View.OnClickListener {
+        adapter.add(ItemPermissionDenied(getString(R.string.message_grant_read_permission), View.OnClickListener {
             requestPermission.onNext(1)
         }))
     }
 
     override fun commandPermission(): Observable<Any> {
         return requestPermission
-    }
-
-    private fun startInstalledAppDetailsActivity(context: Context?) {
-        if (context == null) return
-        val intent = Intent()
-        intent.apply {
-            action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-            addCategory(Intent.CATEGORY_DEFAULT)
-            data = Uri.parse("package:" + context.packageName)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
-            addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
-        }
-        context.startActivity(intent)
     }
 
 }

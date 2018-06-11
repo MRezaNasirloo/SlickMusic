@@ -1,12 +1,13 @@
 package com.mrezanasirloo.slickmusic.presentation.di
 
+import com.mrezanasirloo.slickmusic.presentation.ui.main.ActivityMain
 import com.mrezanasirloo.slickmusic.presentation.ui.play.FragmentPlay
 import dagger.Subcomponent
-import javax.inject.Singleton
 
 @Subcomponent(modules = [ModuleMain::class])
 interface ComponentMain {
     fun inject(fragmentPlay: FragmentPlay)
+    fun inject(fragmentPlay: ActivityMain)
 
     @Subcomponent.Builder
     interface Builder {
@@ -14,4 +15,5 @@ interface ComponentMain {
 
         fun build(): ComponentMain
     }
+
 }
