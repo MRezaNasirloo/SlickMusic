@@ -13,6 +13,7 @@ import com.mrezanasirloo.slick.Presenter
 import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.App
 import com.mrezanasirloo.slickmusic.presentation.ui.main.BackStackFragment
+import com.mrezanasirloo.slickmusic.presentation.ui.play.PresenterPlay
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.Item
 import com.xwray.groupie.kotlinandroidextensions.ViewHolder

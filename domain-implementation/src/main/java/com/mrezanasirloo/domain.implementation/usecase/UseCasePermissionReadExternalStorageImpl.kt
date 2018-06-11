@@ -14,9 +14,9 @@ import javax.inject.Inject
  *         Created on: 2018-06-10
  */
 class UseCasePermissionReadExternalStorageImpl @Inject constructor(private val context: Context)
-    : UseCasePermissionReadExternalStorage<Single<Permission>>() {
+    : UseCasePermissionReadExternalStorage<Unit, Single<Permission>>() {
 
-    override fun execute(): Single<Permission> {
+    override fun execute(parameter: Unit): Single<Permission> {
         return RealRxPermission.getInstance(context.applicationContext as Application)
                 .request(Manifest.permission.READ_EXTERNAL_STORAGE)
     }

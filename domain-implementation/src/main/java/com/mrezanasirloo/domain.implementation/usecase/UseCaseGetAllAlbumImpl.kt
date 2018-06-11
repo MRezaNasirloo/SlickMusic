@@ -14,8 +14,7 @@ import javax.inject.Inject
  *         Created on: 2018-06-10
  */
 class UseCaseGetAllAlbumImpl @Inject constructor(private val repo: RepositoryAlbumImpl) : UseCaseGetAllAlbums() {
-
-    override fun execute(): Observable<List<AlbumDomain>> {
+    override fun execute(parameter: Unit): Observable<List<AlbumDomain>> {
         return Observable.create({ emitter ->
             emitter.onNext(repo.allAlbums())
             emitter.onComplete()

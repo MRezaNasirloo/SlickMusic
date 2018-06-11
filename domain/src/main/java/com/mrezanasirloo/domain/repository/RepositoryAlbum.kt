@@ -8,4 +8,5 @@ import com.mrezanasirloo.domain.model.AlbumDomain
  */
 interface RepositoryAlbum {
     fun allAlbums(): List<AlbumDomain>
+    fun album(id: Int): AlbumDomain
 }

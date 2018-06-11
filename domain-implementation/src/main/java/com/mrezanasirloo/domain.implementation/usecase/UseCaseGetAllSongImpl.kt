@@ -12,7 +12,7 @@ import javax.inject.Inject
  */
 class UseCaseGetAllSongImpl @Inject constructor(private val repo: RepositorySongImpl) : UseCaseGetAllSongs() {
 
-    override fun execute(): Observable<List<SongDomain>> {
+    override fun execute(parameter: Unit): Observable<List<SongDomain>> {
         return Observable.create({ emitter ->
             emitter.onNext(repo.allSongs())
             emitter.onComplete()

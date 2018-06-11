@@ -14,6 +14,10 @@ import javax.inject.Inject
  *         Created on: 2018-06-10
  */
 class RepositoryAlbumImpl @Inject constructor(private val context: Context) : RepositoryAlbum {
+    override fun album(id: Int): AlbumDomain {
+        return AlbumLoader.getAlbum(context, id)
+    }
+
     override fun allAlbums(): List<AlbumDomain> {
         return AlbumLoader.getAllAlbums(context)
     }
