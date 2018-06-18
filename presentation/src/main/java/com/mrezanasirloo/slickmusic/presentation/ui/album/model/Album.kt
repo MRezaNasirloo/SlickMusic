@@ -8,10 +8,27 @@ import com.mrezanasirloo.domain.model.SongDomain
  * @author : M.Reza.Nasirloo@gmail.com
  *         Created on: 2018-06-10
  */
-data class Album(private val songDomains: List<SongDomain> = emptyList()) {
-    constructor(ad: AlbumDomain) : this(
-            ad.songDomains
-    )
+data class Album(private val songs: List<Song> = emptyList()) {
+
+    companion object {
+        fun newInstance(ad: AlbumDomain): Album {
+            val songDomains = ad.songDomains
+            val mutableList: MutableList<Song> = ArrayList(songDomains.size)
+            for (songDomain in songDomains) {
+                mutableList.add(Song(songDomain))
+            }
+            return Album(mutableList.toList())
+        }
+
+        fun newInstance(songDomains: List<SongDomain>): Album {
+            val mutableList: MutableList<Song> = ArrayList(songDomains.size)
+            for (songDomain in songDomains) {
+                mutableList.add(Song(songDomain))
+            }
+            return Album(mutableList.toList())
+        }
+
+    }
 
     fun getId(): Int {
         return safeGetFirstSong().albumId
@@ -38,12 +55,10 @@ data class Album(private val songDomains: List<SongDomain> = emptyList()) {
     }
 
     fun getSongCount(): Int {
-        return songDomains.size
+        return songs.size
     }
 
     fun safeGetFirstSong(): Song {
-        val song: SongDomain = if (songDomains.isEmpty()) SongDomain.EMPTY_SONG else songDomains[0]
-        return Song(song)
-
+        return if (songs.isEmpty()) Song(SongDomain.EMPTY_SONG) else songs[0]
     }
 }
