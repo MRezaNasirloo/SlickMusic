@@ -2,8 +2,10 @@ package com.mrezanasirloo.slickmusic.presentation.ui.main
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Rect
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
+import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -11,8 +13,10 @@ import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
+import android.widget.FrameLayout
 import com.mrezanasirloo.slick.Presenter
 import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.App
@@ -28,6 +32,7 @@ import kotlinx.android.synthetic.main.row_error_rational.view.*
 import javax.inject.Inject
 import javax.inject.Provider
 
+
 class ActivityMain : AppCompatActivity(), ViewMain {
     @Inject
     lateinit var provider: Provider<PresenterMain>
@@ -36,6 +41,7 @@ class ActivityMain : AppCompatActivity(), ViewMain {
     lateinit var presenter: PresenterMain
 
     private val requestPermission: PublishSubject<Any> = PublishSubject.create()
+    private var bottomSheetBehavior: BottomSheetBehavior<FrameLayout>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +55,8 @@ class ActivityMain : AppCompatActivity(), ViewMain {
                     .add(R.id.container_play, FragmentPlay.newInstance(), tag)
                     .commit()
         }
+
+        bottomSheetBehavior = BottomSheetBehavior.from(container_play)
     }
 
     override fun onResume() {
@@ -57,6 +65,20 @@ class ActivityMain : AppCompatActivity(), ViewMain {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED)
             requestPermission.onNext(1)
+    }
+
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            if (bottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED) {
+                val outRect = Rect()
+                container_play.getGlobalVisibleRect(outRect)
+
+                if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt()))
+                    bottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
+
+        return super.dispatchTouchEvent(event)
     }
 
     override fun showPages() {
