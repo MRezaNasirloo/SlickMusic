@@ -8,7 +8,7 @@ import com.mrezanasirloo.domain.model.SongDomain
  * @author : M.Reza.Nasirloo@gmail.com
  *         Created on: 2018-06-10
  */
-data class Album(private val songs: List<Song> = emptyList()) {
+data class Album(val songs: List<Song> = emptyList()) {
 
     companion object {
         fun newInstance(ad: AlbumDomain): Album {

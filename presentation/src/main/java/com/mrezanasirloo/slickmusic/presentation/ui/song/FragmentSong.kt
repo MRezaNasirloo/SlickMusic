@@ -13,7 +13,6 @@ import com.mrezanasirloo.slick.Presenter
 import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.App
 import com.mrezanasirloo.slickmusic.presentation.ui.main.BackStackFragment
-import com.mrezanasirloo.slickmusic.presentation.ui.play.PresenterPlay
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.Item
 import com.xwray.groupie.kotlinandroidextensions.ViewHolder
@@ -29,11 +28,11 @@ import javax.inject.Provider
  */
 class FragmentSong : BackStackFragment(), ViewSong {
     @Inject
-    lateinit var provider: Provider<PresenterPlay>
+    lateinit var provider: Provider<PresenterSong>
 
 
     @Presenter
-    lateinit var presenterPlay: PresenterPlay
+    lateinit var presenterPlay: PresenterSong
 
     companion object {
 
@@ -44,7 +43,7 @@ class FragmentSong : BackStackFragment(), ViewSong {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         App.componentMain().inject(this)
-        PresenterPlay_Slick.bind(this)
+        PresenterSong_Slick.bind(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

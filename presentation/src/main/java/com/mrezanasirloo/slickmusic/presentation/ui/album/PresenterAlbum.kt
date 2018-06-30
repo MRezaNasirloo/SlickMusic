@@ -25,7 +25,7 @@ class PresenterAlbum @Inject constructor(
 
         @Suppress("RedundantSamConstructor")
         val list: Observable<PartialViewState<StateAlbum>> = getAllAlbums.execute(Unit).subscribeOn(io)
-                .map { Observable.fromIterable(it).map { Album(it) }.map { ItemAlbumBig(it) }.toList().blockingGet() }
+                .map { Observable.fromIterable(it).map { Album.newInstance(it) }.map { ItemAlbumBig(it) }.toList().blockingGet() }
                 .map(Function<List<Item>, PartialViewState<StateAlbum>> { PartialStateListAlbum(it) })
                 .startWith(PartialStateEmptyListAlbum())
                 .onErrorReturn { PartialStateErrorAlbum(it) }

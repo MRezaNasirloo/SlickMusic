@@ -28,14 +28,14 @@ class PresenterPlay @Inject constructor(
 ) : SlickPresenterUni<ViewSong, StateSong>(main, io) {
     override fun start(view: ViewSong) {
 
-        @Suppress("RedundantSamConstructor")
-        val list: Observable<PartialViewState<StateSong>> = getAllSongs.execute(view::albumId).subscribeOn(io)
+//        @Suppress("RedundantSamConstructor")
+        /*val list: Observable<PartialViewState<StateSong>> = getAllSongs.execute(view::albumId).subscribeOn(io)
                 .map { Observable.fromIterable(it).map { Song(it) }.map { ItemSongSmall(it) }.toList().blockingGet() }
                 .map(Function<List<Item>, PartialViewState<StateSong>> { PartialStateList(it) })
                 .startWith(PartialStateEmptyList())
                 .onErrorReturn { PartialStateError(it) }
 
-        subscribe(StateSong(), list)
+        subscribe(StateSong(), list)*/
     }
 
     override fun render(state: StateSong, view: ViewSong) {

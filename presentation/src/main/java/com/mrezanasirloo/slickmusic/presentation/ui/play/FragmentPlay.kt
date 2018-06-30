@@ -9,6 +9,7 @@ import android.view.ViewGroup
 
 import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.ui.main.BackStackFragment
+import com.mrezanasirloo.slickmusic.presentation.ui.song.model.Album
 import com.mrezanasirloo.slickmusic.presentation.ui.song.model.Song
 
 
@@ -46,7 +47,7 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
         fun newInstance(album: Album): FragmentPlay {
             val fragment = FragmentPlay()
             val args = Bundle()
-            args.putParcelableArray(ARG_SONGS, album.songs.toArray())
+            args.putParcelableArray(ARG_SONGS, album.songs.toTypedArray())
             fragment.arguments = args
             return fragment
         }

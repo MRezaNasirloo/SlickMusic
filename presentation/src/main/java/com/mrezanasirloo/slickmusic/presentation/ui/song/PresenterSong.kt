@@ -17,7 +17,7 @@ import javax.inject.Named
  * @author : M.Reza.Nasirloo@gmail.com
  *         Created on: 2018-06-10
  */
-class PresenterPlay @Inject constructor(
+class PresenterSong @Inject constructor(
         private val getAllSongs: UseCaseGetAllSongImpl,
         @Named("main") main: Scheduler?,
         @Named("io") io: Scheduler?

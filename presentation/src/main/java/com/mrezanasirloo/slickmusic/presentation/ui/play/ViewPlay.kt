@@ -7,6 +7,6 @@ import com.xwray.groupie.kotlinandroidextensions.Item
  *         Created on: 2018-06-10
  */
 interface ViewPlay {
-    fun update(list: List<Item>)
-    fun showError(error: Throwable)
+    /*fun update(list: List<Item>)
+    fun showError(error: Throwable)*/
 }
