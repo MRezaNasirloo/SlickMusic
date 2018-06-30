@@ -48,6 +48,8 @@ dependencies {
     implementation 'com.mrezanasirloo:slick-middleware:1.1.3'
     implementation 'com.mrezanasirloo:slick-reactive:1.1.3'
     implementation 'com.mrezanasirloo:slick-support-fragment:1.1.3'
+    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
     annotationProcessor 'com.mrezanasirloo:slick-compiler:1.1.3'
     kapt 'com.mrezanasirloo:slick-compiler:1.1.3'
 

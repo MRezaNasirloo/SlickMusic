@@ -18,6 +18,7 @@ import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.App
 import com.mrezanasirloo.slickmusic.presentation.openAppSettingPage
 import com.mrezanasirloo.slickmusic.presentation.ui.album.FragmentAlbum
+import com.mrezanasirloo.slickmusic.presentation.ui.play.FragmentPlay
 import com.mrezanasirloo.slickmusic.presentation.ui.song.FragmentSong
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -41,6 +42,13 @@ class ActivityMain : AppCompatActivity(), ViewMain {
         setContentView(R.layout.activity_main)
         App.componentMain().inject(this)
         PresenterMain_Slick.bind(this)
+        val fm = supportFragmentManager
+        val tag = FragmentPlay::class.java.simpleName
+        if (fm.findFragmentByTag(tag) == null) {
+            fm.beginTransaction()
+                    .add(R.id.container_play, FragmentPlay.newInstance(), tag)
+                    .commit()
+        }
     }
 
     override fun onResume() {
@@ -55,6 +63,7 @@ class ActivityMain : AppCompatActivity(), ViewMain {
         println("ActivityMain.showPages")
         permission_view.visibility = INVISIBLE
         navigation.visibility = VISIBLE
+        container_play.visibility = VISIBLE
         view_pager.visibility = VISIBLE
         view_pager.offscreenPageLimit = 2
         view_pager.adapter = Pager(supportFragmentManager)
@@ -74,6 +83,7 @@ class ActivityMain : AppCompatActivity(), ViewMain {
         val button = permission_view.button_grant
         view_pager.visibility = INVISIBLE
         navigation.visibility = INVISIBLE
+        container_play.visibility = INVISIBLE
         permission_view.visibility = VISIBLE
         button.setText(R.string.message_go_to_settings)
         button_grant.setOnClickListener {
@@ -86,6 +96,7 @@ class ActivityMain : AppCompatActivity(), ViewMain {
         val button = permission_view.button_grant
         view_pager.visibility = INVISIBLE
         navigation.visibility = INVISIBLE
+        container_play.visibility = INVISIBLE
         permission_view.visibility = VISIBLE
         button.setText(R.string.message_grant_read_permission)
         button.setOnClickListener {
