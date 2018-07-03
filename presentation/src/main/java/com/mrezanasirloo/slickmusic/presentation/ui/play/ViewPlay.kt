@@ -1,6 +1,6 @@
 package com.mrezanasirloo.slickmusic.presentation.ui.play
 
-import com.xwray.groupie.kotlinandroidextensions.Item
+import com.mrezanasirloo.slickmusic.presentation.ui.song.model.Song
 
 /**
  * @author : M.Reza.Nasirloo@gmail.com
@@ -9,4 +9,5 @@ import com.xwray.groupie.kotlinandroidextensions.Item
 interface ViewPlay {
     /*fun update(list: List<Item>)
     fun showError(error: Throwable)*/
+    fun playSong(vararg song: Song)
 }
