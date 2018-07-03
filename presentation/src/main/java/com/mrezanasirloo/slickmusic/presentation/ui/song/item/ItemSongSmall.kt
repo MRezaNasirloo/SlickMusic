@@ -1,10 +1,13 @@
 package com.mrezanasirloo.slickmusic.presentation.ui.song.item
 
+import android.annotation.SuppressLint
 import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.ui.song.model.Song
 import com.xwray.groupie.kotlinandroidextensions.Item
 import com.xwray.groupie.kotlinandroidextensions.ViewHolder
 import kotlinx.android.synthetic.main.row_song_small.*
+import java.text.DecimalFormat
+import kotlin.math.abs
 
 /**
  * @author : M.Reza.Nasirloo@gmail.com
@@ -13,10 +16,11 @@ import kotlinx.android.synthetic.main.row_song_small.*
 class ItemSongSmall(private val song: Song) : Item() {
     override fun getLayout() = R.layout.row_song_small
 
+    @SuppressLint("SetTextI18n")
     override fun bind(viewHolder: ViewHolder, position: Int) {
         viewHolder.textView_song_title.text = song.title
         viewHolder.textView_song_artist.text = song.artistName
-        viewHolder.textView_no.text = song.trackNumber.toString()
+        viewHolder.textView_no.text = (abs(song.trackNumber) % 1000).toString()
     }
 
 }

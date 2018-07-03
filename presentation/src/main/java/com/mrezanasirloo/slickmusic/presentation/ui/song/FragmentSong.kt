@@ -56,7 +56,7 @@ class FragmentSong : BackStackFragment(), ViewSong {
         super.onViewCreated(view, savedInstanceState)
         list.adapter = adapter
         list.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        list.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL))
+        list.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
     }
 
     override fun update(list: List<Item>) {
