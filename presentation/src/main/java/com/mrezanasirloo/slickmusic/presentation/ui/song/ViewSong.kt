@@ -1,6 +1,8 @@
 package com.mrezanasirloo.slickmusic.presentation.ui.song
 
+import com.mrezanasirloo.domain.implementation.model.Song
 import com.xwray.groupie.kotlinandroidextensions.Item
+import io.reactivex.Observable
 
 /**
  * @author : M.Reza.Nasirloo@gmail.com
@@ -9,4 +11,5 @@ import com.xwray.groupie.kotlinandroidextensions.Item
 interface ViewSong {
     fun update(list: List<Item>)
     fun showError(error: Throwable)
+    fun playSongs(): Observable<Song>
 }

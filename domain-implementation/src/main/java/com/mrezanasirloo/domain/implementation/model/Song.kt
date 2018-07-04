@@ -35,4 +35,6 @@ data class Song(
             sd.artistId,
             sd.artistName
     )
+
+    fun toSongDomain(): SongDomain = SongDomain(id, title, trackNumber, year, duration, data, dateModified, albumId, albumName, artistId, artistName)
 }

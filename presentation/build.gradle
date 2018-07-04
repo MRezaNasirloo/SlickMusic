@@ -38,6 +38,7 @@ dependencies {
     implementation project(path: ':domain')
     implementation project(path: ':domain-implementation')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation 'com.android.support:support-media-compat:27.1.1'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:palette-v7:27.1.1'

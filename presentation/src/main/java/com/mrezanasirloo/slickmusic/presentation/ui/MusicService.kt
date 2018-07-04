@@ -10,8 +10,7 @@ import android.support.v4.media.MediaBrowserServiceCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
-import android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
+import android.support.v4.media.session.MediaSessionCompat.*
 import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v4.media.session.PlaybackStateCompat.*
 import android.util.Log
@@ -39,7 +38,7 @@ class MusicService : MediaBrowserServiceCompat() {
     override fun onCreate() {
         super.onCreate()
         mediaSession = MediaSessionCompat(this, "MediaService")
-        mediaSession.setFlags(FLAG_HANDLES_MEDIA_BUTTONS or FLAG_HANDLES_TRANSPORT_CONTROLS)
+        mediaSession.setFlags(FLAG_HANDLES_MEDIA_BUTTONS or FLAG_HANDLES_TRANSPORT_CONTROLS or FLAG_HANDLES_QUEUE_COMMANDS)
         val mediaSessionCallback = MediaSessionCallback()
         mediaSession.setCallback(mediaSessionCallback)
         sessionToken = mediaSession.sessionToken
@@ -78,6 +77,7 @@ class MusicService : MediaBrowserServiceCompat() {
         private var mPreparedMedia: MediaMetadataCompat? = null
 
         override fun onAddQueueItem(description: MediaDescriptionCompat?) {
+            Log.d(TAG, "onAddQueueItem() called with: description = [$description]")
             description?.let {
                 playlist.add(MediaSessionCompat.QueueItem(description, description.hashCode().toLong()))
                 queueIndex = if (queueIndex == -1) 0 else queueIndex
@@ -85,7 +85,18 @@ class MusicService : MediaBrowserServiceCompat() {
             }
         }
 
+        override fun onAddQueueItem(description: MediaDescriptionCompat?, index: Int) {
+            Log.d(TAG, "onAddQueueItem() called with: description = [$description], index = [$index]")
+            super.onAddQueueItem(description, index)
+        }
+
+        override fun onRemoveQueueItemAt(index: Int) {
+            Log.d(TAG, "onRemoveQueueItemAt() called with: index = [$index]")
+            super.onRemoveQueueItemAt(index)
+        }
+
         override fun onRemoveQueueItem(description: MediaDescriptionCompat?) {
+            Log.d(TAG, "onRemoveQueueItem() called with: description = [$description]")
             description?.let {
                 playlist.remove(MediaSessionCompat.QueueItem(description, description.hashCode().toLong()))
                 queueIndex = if (playlist.isEmpty()) -1 else queueIndex
@@ -134,31 +145,6 @@ class MusicService : MediaBrowserServiceCompat() {
             queueIndex--
             onPlay()
         }
-
-        override fun onPlayFromMediaId(mediaId: String?, extras: Bundle?) {
-            super.onPlayFromMediaId(mediaId, extras)
-            extras?.apply {
-                classLoader = this@MusicService.classLoader
-                val song = getParcelable<Song>("SONG")
-                if (mediaPlayer == null) {
-                    mediaPlayer = MediaPlayer()
-                }
-                if (!mediaSession.isActive) {
-                    mediaSession.isActive = true
-                }
-                mediaPlayer?.run {
-                    reset()
-                    setAudioStreamType(AudioManager.STREAM_MUSIC)
-                    setDataSource(song.data)
-                    prepare()
-                    start()
-                    mediaSession.setPlaybackState(stateBuilder.setState(STATE_PLAYING, mediaPlayer?.currentPosition?.toLong()!!, 1f).build())
-                }
-            }
-            println("onPlayFromMediaId mediaId = [${mediaId}], extras = [${extras.toString()}]")
-
-        }
-
         override fun onPlay() {
             super.onPlay()
             println("MusicService.onPlay")
@@ -168,7 +154,7 @@ class MusicService : MediaBrowserServiceCompat() {
             }
 
             playlist[queueIndex].description.extras?.apply {
-                classLoader = this@MusicService.classLoader
+                classLoader = Song::class.java.classLoader
                 val song = getParcelable<Song>("SONG")
                 if (mediaPlayer == null) {
                     mediaPlayer = MediaPlayer()

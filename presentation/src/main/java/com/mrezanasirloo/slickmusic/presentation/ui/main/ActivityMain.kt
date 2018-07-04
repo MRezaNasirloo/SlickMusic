@@ -35,11 +35,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 
-class ActivityMain : AppCompatActivity(), ViewMain, OnPlaybackCommands {
-    override fun playSongs(vararg songs: Song) {
-        TODO("not implemented")
-    }
-
+class ActivityMain : AppCompatActivity(), ViewMain {
     @Inject
     lateinit var provider: Provider<PresenterMain>
 

@@ -9,6 +9,7 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import com.mrezanasirloo.domain.implementation.model.Song
@@ -95,6 +96,11 @@ class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, 
 
     inner class MediaControllerCallback : MediaControllerCompat.Callback() {
 
+        override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>?) {
+            super.onQueueChanged(queue)
+            Log.d(TAG, "onQueueChanged() called with: queue = [$queue]")
+        }
+
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
             super.onPlaybackStateChanged(state)
             state?.let {
@@ -123,7 +129,10 @@ class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, 
 
     override fun playSongs(songs: Iterable<SongDomain>): Completable {
         return Completable.create {
-            mediaController.transportControls.sendCustomAction(COMMAND_CLEAR_QUEUE, null)
+            val songDomain = songs.iterator().next()
+            val bundle = Bundle().apply { putParcelable("SONG", Song(songDomain)) }
+            mediaController.transportControls.sendCustomAction(COMMAND_CLEAR_QUEUE, bundle)
+//            mediaController.transportControls.playFromMediaId(songDomain.id.toString(), bundle)
             songs.forEach {
                 addQueueSong(it)
             }
@@ -133,21 +142,28 @@ class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, 
     }
 
     override fun addQueueSong(songs: Iterable<SongDomain>): Completable {
+        Log.d(TAG, "addQueueSong() called with: songs = [$songs]")
         return Completable.create {
             songs.forEach {
                 addQueueSong(it)
             }
+            mediaController.transportControls.prepare()
             it.onComplete()
+            Log.d(TAG, "addQueueSong")
         }
     }
 
-    private fun addQueueSong(it: SongDomain) {
+    private fun addQueueSong(song: SongDomain) {
+        Log.d(TAG, "addQueueSong() called with: song = [$song]")
+        val bundle = Bundle()
+        bundle.putParcelable("SLICK_SONG", Song(song))
         val builder = MediaDescriptionCompat.Builder()
-                .setExtras(Bundle().apply { putParcelable("SONG", Song(it)) })
-                .setMediaId(it.id.toString())
-                .setTitle(it.title)
-                .setSubtitle(it.artistName)
+                .setExtras(bundle)
+                .setMediaId(song.id.toString())
+                .setTitle(song.title)
+                .setSubtitle(song.artistName)
         mediaController.addQueueItem(builder.build())
+        Log.d(TAG, "addQueueSong() finished")
     }
 
     override fun skipToQueueSong(id: Long): Completable {
