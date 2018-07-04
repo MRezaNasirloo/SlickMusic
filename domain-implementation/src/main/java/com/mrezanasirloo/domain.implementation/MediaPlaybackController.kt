@@ -57,7 +57,9 @@ class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, 
     }
 
     override fun onStart(owner: LifecycleOwner) {
-        mediaBrowser.connect()
+        if (!mediaBrowser.isConnected) {
+            mediaBrowser.connect()
+        }
     }
 
     override fun onStop(owner: LifecycleOwner) {
