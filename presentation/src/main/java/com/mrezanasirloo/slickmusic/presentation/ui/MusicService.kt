@@ -4,6 +4,7 @@ import android.content.Intent
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.ResultReceiver
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserServiceCompat
 import android.support.v4.media.MediaDescriptionCompat
@@ -13,6 +14,8 @@ import android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_MEDIA_BU
 import android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
 import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v4.media.session.PlaybackStateCompat.*
+import android.util.Log
+import com.mrezanasirloo.domain.implementation.COMMAND_CLEAR_QUEUE
 import com.mrezanasirloo.domain.implementation.model.Song
 import com.mrezanasirloo.slickmusic.R
 import java.util.*
@@ -20,6 +23,8 @@ import java.util.*
 
 class MusicService : MediaBrowserServiceCompat() {
 
+
+    private val TAG: String = this::class.java.simpleName
 
     private val MY_MEDIA_ROOT_ID = "media_root_id"
     private val MY_EMPTY_MEDIA_ROOT_ID = "empty_root_id"
@@ -86,6 +91,21 @@ class MusicService : MediaBrowserServiceCompat() {
                 queueIndex = if (playlist.isEmpty()) -1 else queueIndex
                 mediaSession.setQueue(playlist)
             }
+        }
+
+        override fun onCustomAction(action: String?, extras: Bundle?) {
+            Log.d(TAG, "onCustomAction() called with: action = [$action], extras = [$extras]")
+            when (action) {
+                COMMAND_CLEAR_QUEUE -> {
+                    playlist.clear()
+                    queueIndex = -1
+                    mediaSession.setQueue(playlist)
+                }
+            }
+        }
+
+        override fun onCommand(command: String?, extras: Bundle?, cb: ResultReceiver?) {
+            Log.d(TAG, "onCommand() called with: command = [$command], extras = [$extras], cb = [$cb]")
         }
 
         override fun onSeekTo(pos: Long) {
@@ -157,6 +177,7 @@ class MusicService : MediaBrowserServiceCompat() {
                     mediaSession.isActive = true
                 }
                 mediaPlayer?.run {
+                    startService(Intent(this@MusicService, MusicService::class.java))
                     reset()
                     setAudioStreamType(AudioManager.STREAM_MUSIC)
                     setDataSource(song.data)

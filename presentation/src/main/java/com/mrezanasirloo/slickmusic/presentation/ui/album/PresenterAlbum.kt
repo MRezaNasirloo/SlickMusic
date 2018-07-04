@@ -18,8 +18,8 @@ import javax.inject.Named
  */
 class PresenterAlbum @Inject constructor(
         private val getAllAlbums: UseCaseGetAllAlbumImpl,
-        @Named("main") main: Scheduler?,
-        @Named("io") io: Scheduler?
+        @Named("main") main: Scheduler,
+        @Named("io") io: Scheduler
 ) : SlickPresenterUni<ViewAlbum, StateAlbum>(main, io) {
     override fun start(view: ViewAlbum) {
 

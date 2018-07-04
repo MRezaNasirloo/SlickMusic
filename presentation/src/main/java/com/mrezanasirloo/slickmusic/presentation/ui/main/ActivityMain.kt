@@ -17,6 +17,7 @@ import android.view.MotionEvent
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.widget.FrameLayout
+import com.mrezanasirloo.domain.implementation.MediaPlaybackController
 import com.mrezanasirloo.slick.Presenter
 import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.App
@@ -24,6 +25,7 @@ import com.mrezanasirloo.slickmusic.presentation.openAppSettingPage
 import com.mrezanasirloo.slickmusic.presentation.ui.album.FragmentAlbum
 import com.mrezanasirloo.slickmusic.presentation.ui.play.FragmentPlay
 import com.mrezanasirloo.slickmusic.presentation.ui.song.FragmentSong
+import com.mrezanasirloo.domain.implementation.model.Song
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
@@ -33,12 +35,19 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 
-class ActivityMain : AppCompatActivity(), ViewMain {
+class ActivityMain : AppCompatActivity(), ViewMain, OnPlaybackCommands {
+    override fun playSongs(vararg songs: Song) {
+        TODO("not implemented")
+    }
+
     @Inject
     lateinit var provider: Provider<PresenterMain>
 
     @Presenter
     lateinit var presenter: PresenterMain
+
+    @Inject
+    lateinit var mediaPlaybackController: MediaPlaybackController
 
     private val requestPermission: PublishSubject<Any> = PublishSubject.create()
     private var bottomSheetBehavior: BottomSheetBehavior<FrameLayout>? = null
@@ -55,7 +64,7 @@ class ActivityMain : AppCompatActivity(), ViewMain {
                     .add(R.id.container_play, FragmentPlay.newInstance(), tag)
                     .commit()
         }
-
+        lifecycle.addObserver(mediaPlaybackController)
         bottomSheetBehavior = BottomSheetBehavior.from(container_play)
     }
 
@@ -133,7 +142,11 @@ class ActivityMain : AppCompatActivity(), ViewMain {
     override fun onBackPressed() {
         if (BackStackFragment.handleBackPressed(supportFragmentManager)) return
         super.onBackPressed()
+    }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycle.removeObserver(mediaPlaybackController)
     }
 
     inner class BottomNavListener : BottomNavigationView.OnNavigationItemSelectedListener {

@@ -1,5 +1,6 @@
 package com.mrezanasirloo.slickmusic.presentation.ui.song.model
 
+import com.mrezanasirloo.domain.implementation.model.Song
 import com.mrezanasirloo.domain.model.AlbumDomain
 import com.mrezanasirloo.domain.model.SongDomain
 

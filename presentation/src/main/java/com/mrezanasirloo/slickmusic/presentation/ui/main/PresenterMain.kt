@@ -12,8 +12,8 @@ import javax.inject.Named
 
 class PresenterMain @Inject constructor(
         private val readPermission: UseCasePermissionReadExternalStorageImpl,
-        @Named("main") main: Scheduler?,
-        @Named("io") io: Scheduler?
+        @Named("main") main: Scheduler,
+        @Named("io") io: Scheduler
 ) : SlickPresenterUni<ViewMain, StateMain>(main, io) {
     override fun start(view: ViewMain) {
         @Suppress("RedundantSamConstructor")

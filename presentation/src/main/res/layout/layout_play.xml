@@ -15,12 +15,12 @@
         android:layout_height="48dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
-        android:tint="@color/colorPrimary"
+        android:tint="@color/button_dark_gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_play_arrow_black_24dp"
+        tools:srcCompat="@drawable/ic_play_arrow_black_24dp"
         />
 
     <ProgressBar
@@ -37,13 +37,13 @@
         />
 
     <ImageView
-        android:tint="#4d4d4d"
         android:id="@+id/imageView_album_play"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginBottom="4dp"
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
+        android:tint="@color/button_dark_gray"
         app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

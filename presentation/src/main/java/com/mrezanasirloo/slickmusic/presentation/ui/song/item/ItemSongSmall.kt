@@ -2,18 +2,17 @@ package com.mrezanasirloo.slickmusic.presentation.ui.song.item
 
 import android.annotation.SuppressLint
 import com.mrezanasirloo.slickmusic.R
-import com.mrezanasirloo.slickmusic.presentation.ui.song.model.Song
+import com.mrezanasirloo.domain.implementation.model.Song
 import com.xwray.groupie.kotlinandroidextensions.Item
 import com.xwray.groupie.kotlinandroidextensions.ViewHolder
 import kotlinx.android.synthetic.main.row_song_small.*
-import java.text.DecimalFormat
 import kotlin.math.abs
 
 /**
  * @author : M.Reza.Nasirloo@gmail.com
  *         Created on: 2018-06-10
  */
-class ItemSongSmall(private val song: Song) : Item() {
+class ItemSongSmall(val song: Song) : Item() {
     override fun getLayout() = R.layout.row_song_small
 
     @SuppressLint("SetTextI18n")

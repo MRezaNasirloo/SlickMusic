@@ -1,6 +1,5 @@
-package com.mrezanasirloo.slickmusic.presentation.ui.song.model
+package com.mrezanasirloo.domain.implementation.model
 
-import android.os.Parcel
 import android.os.Parcelable
 import com.mrezanasirloo.domain.model.SongDomain
 import kotlinx.android.parcel.Parcelize
