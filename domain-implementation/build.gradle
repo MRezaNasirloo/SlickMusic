@@ -21,20 +21,23 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
     api project(':domain')
     implementation project(':data')
-
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation 'io.reactivex.rxjava2:rxjava:2.1.14'
     implementation 'javax.inject:javax.inject:1'
-    implementation ('com.vanniktech:rxpermission:0.3.0'){
+    implementation('com.vanniktech:rxpermission:0.3.0') {
         exclude module: 'rxjava'
         exclude module: 'support-annotations'
     }
-
-
+    api 'android.arch.lifecycle:common-java8:1.1.1'
+    implementation 'com.android.support:support-media-compat:27.1.1'
     testImplementation 'junit:junit:4.12'
 }
