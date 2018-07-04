@@ -17,9 +17,9 @@ import javax.inject.Inject
 class UseCaseGetAlbumImpl @Inject constructor(private val repo: RepositoryAlbumImpl) : UseCaseGetAlbum() {
 
     override fun execute(parameter: Int): Observable<AlbumDomain> {
-        return Observable.create({ emitter ->
+        return Observable.create { emitter ->
             emitter.onNext(repo.album(parameter))
             emitter.onComplete()
-        })
+        }
     }
 }
