@@ -28,11 +28,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
-        android:focusable="true"
+        android:elevation="16dp"
+        android:outlineProvider="bounds"
         app:behavior_hideable="false"
         app:behavior_peekHeight="60dp"
-        app:elevation="8dp"
         app:layout_behavior="@string/bottom_sheet_behavior"
+        tools:ignore="KeyboardInaccessibleWidget"
+        tools:targetApi="lollipop"
         />
 
     <android.support.design.widget.BottomNavigationView
