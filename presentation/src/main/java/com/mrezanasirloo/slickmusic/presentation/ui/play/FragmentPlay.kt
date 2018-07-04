@@ -20,6 +20,7 @@ import com.mrezanasirloo.slickmusic.presentation.ui.main.BackStackFragment
 import com.mrezanasirloo.slickmusic.presentation.ui.song.model.Album
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.layout_play.*
+import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Provider
@@ -32,6 +33,11 @@ import javax.inject.Provider
  */
 class FragmentPlay : BackStackFragment(), ViewPlay {
     private val TAG: String = FragmentPlay::class.java.simpleName
+    private val formatter = DecimalFormat("#00.###")
+    private val interpolator = LinearInterpolator()
+    private var throttleFirst: Observable<Any>? = null
+    private var objectAnimator: ObjectAnimator? = null
+
 
     @Inject
     lateinit var provider: Provider<PresenterPlay>
@@ -53,50 +59,81 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        throttleFirst = RxView.clicks(button_play_pause).throttleFirst(1, TimeUnit.SECONDS).share()
+    }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        throttleFirst = null
+        releaseObjectAnimator()
     }
 
     override fun play(): Observable<Any> {
-        return RxView.clicks(button_play_pause).throttleFirst(1, TimeUnit.SECONDS)
-                .filter { button_play_pause.getTag(0) == STATE_PAUSED }
+        return throttleFirst?.filter { button_play_pause.getTag(R.id.button_play_pause) == STATE_PAUSED }!!
     }
 
     override fun pause(): Observable<Any> {
-        return RxView.clicks(button_play_pause).throttleFirst(1, TimeUnit.SECONDS)
-                .filter { button_play_pause.getTag(0) == STATE_PLAYING }
+        return throttleFirst?.filter { button_play_pause.getTag(R.id.button_play_pause) == STATE_PLAYING }!!
     }
 
     override fun showError(error: Throwable) {
         Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
     }
 
-    private val interpolator = LinearInterpolator()
-
     override fun updateState(playbackState: PlaybackStateDomain) {
-        val objectAnimator = ObjectAnimator.ofFloat(progressBar, "progress", 100f)
-        val progress = (playbackState.position * 100 / playbackState.song.duration).toInt()
+        val duration = playbackState.song.duration
         when (playbackState.state) {
             STATE_NONE -> {
                 button_play_pause.setImageDrawable(null)
                 progressBar.progress = 0
             }
             STATE_PLAYING -> {
+                releaseObjectAnimator()
+                val progress = (playbackState.position * 1000 / duration).toInt()
+                objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", progress, 1000)
                 button_play_pause.run {
                     setImageResource(R.drawable.ic_pause_black_24dp)
-                    setTag(0, STATE_PAUSED)
+                    setTag(R.id.button_play_pause, STATE_PLAYING)
                     progressBar.progress = progress
-                    objectAnimator.duration = playbackState.song.duration - playbackState.position
-                    objectAnimator.interpolator = interpolator
-                    objectAnimator.start()
-                    objectAnimator.cancel()
+                    objectAnimator?.let {
+                        it.duration = duration - playbackState.position
+                        it.interpolator = interpolator
+                        it.start()
+                        it.addUpdateListener {
+                            updateDuration(it.currentPlayTime + playbackState.position, duration)
+                        }
+                    }
                 }
+                textView_tittle.text = playbackState.song.title
+                updateDuration(playbackState.position, duration)
+
             }
             STATE_PAUSED, STATE_STOPPED -> button_play_pause.run {
+                releaseObjectAnimator()
+                val progress = (playbackState.position * 1000 / duration).toInt()
                 setImageResource(R.drawable.ic_play_arrow_black_24dp)
-                setTag(0, STATE_PLAYING)
+                setTag(R.id.button_play_pause, STATE_PAUSED)
                 progressBar.progress = progress
+                textView_tittle.text = playbackState.song.title
+                updateDuration(playbackState.position, duration)
             }
         }
+    }
+
+    private fun releaseObjectAnimator() {
+        objectAnimator?.removeAllUpdateListeners()
+        objectAnimator?.removeAllListeners()
+        objectAnimator?.cancel()
+        objectAnimator = null
+    }
+
+    private fun updateDuration(position: Long = 0, duration: Long) {
+        // todo don't calculate every time
+        val seconds = TimeUnit.SECONDS.convert(duration, TimeUnit.MILLISECONDS)
+        val minutes = TimeUnit.MINUTES.convert(duration, TimeUnit.MILLISECONDS)
+        val secondsPassed = TimeUnit.SECONDS.convert(position, TimeUnit.MILLISECONDS)
+        val minutesPassed = TimeUnit.MINUTES.convert(position, TimeUnit.MILLISECONDS)
+        textView_remaining?.text = "${formatter.format(minutesPassed % 60)}:${formatter.format(secondsPassed % 60)} / ${formatter.format(minutes % 60)}:${formatter.format(seconds % 60)}"
     }
 
     companion object {

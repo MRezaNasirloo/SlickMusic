@@ -25,6 +25,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 const val COMMAND_CLEAR_QUEUE = "COMMAND_CLEAR_QUEUE"
+const val COMMAND_ADD_QUEUE_ITEM = "COMMAND_ADD_QUEUE_ITEM"
+const val COMMAND_REMOVE_QUEUE_ITEM = "COMMAND_REMOVE_QUEUE_ITEM"
+const val COMMAND_REQUEST_PLAYBACK_STATE = "COMMAND_REQUEST_PLAYBACK_STATE"
 
 /**
  * @author : M.Reza.Nasirloo@gmail.com
@@ -80,7 +83,7 @@ class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, 
             mediaController = MediaControllerCompat(activity.applicationContext, mediaBrowser.sessionToken)
             MediaControllerCompat.setMediaController(activity, mediaController)
             mediaController.registerCallback(mediaControllerCallback)
-
+            requestPlaybackState().subscribe()
         }
 
         override fun onConnectionSuspended() {
@@ -119,7 +122,19 @@ class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, 
         }
 
         private fun mapToDomain(state: PlaybackStateCompat): PlaybackStateDomain {
-            return PlaybackStateDomain(state.state, state.position, state.actions, state.playbackSpeed, state.lastPositionUpdateTime)
+            return PlaybackStateDomain(state.state,
+                    state.position,
+                    state.actions,
+                    state.playbackSpeed,
+                    state.lastPositionUpdateTime,
+                    state.extras?.getParcelable<Song>("SONG")?.toSongDomain()!!)
+        }
+    }
+
+    override fun requestPlaybackState(): Completable {
+        return Completable.create {
+            mediaController.transportControls.sendCustomAction(COMMAND_REQUEST_PLAYBACK_STATE, Bundle.EMPTY)
+            it.onComplete()
         }
     }
 
@@ -129,13 +144,11 @@ class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, 
 
     override fun playSongs(songs: Iterable<SongDomain>): Completable {
         return Completable.create {
-            val songDomain = songs.iterator().next()
-            val bundle = Bundle().apply { putParcelable("SONG", Song(songDomain)) }
-            mediaController.transportControls.sendCustomAction(COMMAND_CLEAR_QUEUE, bundle)
-//            mediaController.transportControls.playFromMediaId(songDomain.id.toString(), bundle)
+            mediaController.transportControls.sendCustomAction(COMMAND_CLEAR_QUEUE, Bundle.EMPTY)
             songs.forEach {
                 addQueueSong(it)
             }
+            mediaController.transportControls.prepare()
             mediaController.transportControls.play()
             it.onComplete()
         }
@@ -147,7 +160,6 @@ class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, 
             songs.forEach {
                 addQueueSong(it)
             }
-            mediaController.transportControls.prepare()
             it.onComplete()
             Log.d(TAG, "addQueueSong")
         }
@@ -155,14 +167,14 @@ class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, 
 
     private fun addQueueSong(song: SongDomain) {
         Log.d(TAG, "addQueueSong() called with: song = [$song]")
-        val bundle = Bundle()
-        bundle.putParcelable("SLICK_SONG", Song(song))
+        // TODO("Fix This when this issue is resolved") https://issuetracker.google.com/issues/111146580
         val builder = MediaDescriptionCompat.Builder()
-                .setExtras(bundle)
+//                .setExtras(bundle)
                 .setMediaId(song.id.toString())
                 .setTitle(song.title)
                 .setSubtitle(song.artistName)
         mediaController.addQueueItem(builder.build())
+        mediaController.transportControls.sendCustomAction(COMMAND_ADD_QUEUE_ITEM, Bundle().apply { putParcelable("SONG", Song(song)) })
         Log.d(TAG, "addQueueSong() finished")
     }
 

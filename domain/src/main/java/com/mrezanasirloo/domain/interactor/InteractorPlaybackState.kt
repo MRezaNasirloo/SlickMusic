@@ -1,6 +1,7 @@
 package com.mrezanasirloo.domain.interactor
 
 import com.mrezanasirloo.domain.model.PlaybackStateDomain
+import io.reactivex.Completable
 import io.reactivex.Observable
 
 /**
@@ -9,4 +10,5 @@ import io.reactivex.Observable
  */
 interface InteractorPlaybackState {
     fun playbackStateUpdate() : Observable<PlaybackStateDomain>
+    fun requestPlaybackState(): Completable
 }
