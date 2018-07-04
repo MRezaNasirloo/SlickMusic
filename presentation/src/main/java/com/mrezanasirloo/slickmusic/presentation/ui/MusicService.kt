@@ -50,7 +50,8 @@ class MusicService : MediaBrowserServiceCompat() {
 
         // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player
         stateBuilder.setActions(ACTION_PLAY or ACTION_PLAY_PAUSE)
-        mediaSession.setPlaybackState(stateBuilder.build())
+        playbackState = stateBuilder.build()
+        mediaSession.setPlaybackState(playbackState)
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
@@ -125,7 +126,8 @@ class MusicService : MediaBrowserServiceCompat() {
                     playlistSong.remove(song!!)
                 }
                 COMMAND_REQUEST_PLAYBACK_STATE -> mediaPlayer?.run {
-                    mediaSession.setPlaybackState(stateBuilder.setState(playbackState?.state!!, mediaPlayer?.currentPosition?.toLong()!!, 1f).build())
+                    playbackState = stateBuilder.setState(playbackState?.state!!, mediaPlayer?.currentPosition?.toLong()!!, 1f).build()
+                    mediaSession.setPlaybackState(playbackState)
                 }
             }
         }
@@ -227,7 +229,8 @@ class MusicService : MediaBrowserServiceCompat() {
                 reset()
             }
             mediaSession.isActive = false
-            mediaSession.setPlaybackState(stateBuilder.setState(STATE_STOPPED, mediaPlayer?.currentPosition?.toLong()!!, 1f).build())
+            playbackState = stateBuilder.setState(STATE_STOPPED, mediaPlayer?.currentPosition?.toLong()!!, 1f).build()
+            mediaSession.setPlaybackState(playbackState)
 
         }
 
@@ -237,7 +240,8 @@ class MusicService : MediaBrowserServiceCompat() {
             mediaPlayer?.run {
                 pause()
             }
-            mediaSession.setPlaybackState(stateBuilder.setState(STATE_PAUSED, mediaPlayer?.currentPosition?.toLong()!!, 1f).build())
+            playbackState = stateBuilder.setState(STATE_PAUSED, mediaPlayer?.currentPosition?.toLong()!!, 1f).build()
+            mediaSession.setPlaybackState(playbackState)
         }
     }
 }

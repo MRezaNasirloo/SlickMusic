@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.media.session.PlaybackStateCompat.*
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -65,6 +66,10 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
     override fun onDestroyView() {
         super.onDestroyView()
         throttleFirst = null
+    }
+
+    override fun onStop() {
+        super.onStop()
         releaseObjectAnimator()
     }
 
@@ -81,6 +86,7 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
     }
 
     override fun updateState(playbackState: PlaybackStateDomain) {
+        Log.d(TAG, "updateState() called with: playbackState = [$playbackState]")
         val duration = playbackState.song.duration
         when (playbackState.state) {
             STATE_NONE -> {
