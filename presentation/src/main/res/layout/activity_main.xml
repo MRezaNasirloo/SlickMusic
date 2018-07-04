@@ -27,6 +27,8 @@
         android:id="@+id/container_play"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
         app:behavior_hideable="false"
         app:behavior_peekHeight="60dp"
         app:elevation="8dp"
