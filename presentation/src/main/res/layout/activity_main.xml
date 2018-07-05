@@ -31,7 +31,7 @@
         android:elevation="16dp"
         android:outlineProvider="bounds"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="60dp"
+        app:behavior_peekHeight="@dimen/height_section_play"
         app:layout_behavior="@string/bottom_sheet_behavior"
         tools:ignore="KeyboardInaccessibleWidget"
         tools:targetApi="lollipop"

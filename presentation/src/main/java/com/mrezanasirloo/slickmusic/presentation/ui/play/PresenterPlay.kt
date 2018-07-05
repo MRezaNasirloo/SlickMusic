@@ -5,7 +5,7 @@ import com.mrezanasirloo.domain.implementation.usecase.*
 import com.mrezanasirloo.domain.model.PlaybackStateDomain
 import com.mrezanasirloo.slick.uni.PartialViewState
 import com.mrezanasirloo.slick.uni.SlickPresenterUni
-import com.mrezanasirloo.slickmusic.presentation.ui.song.item.ItemSongSmall
+import com.mrezanasirloo.slickmusic.presentation.ui.song.item.ItemSongQueue
 import com.xwray.groupie.kotlinandroidextensions.Item
 import io.reactivex.Observable
 import io.reactivex.Scheduler
@@ -38,7 +38,7 @@ class PresenterPlay @Inject constructor(
 
         @Suppress("RedundantSamConstructor")
         val queueUpdates: Observable<PartialViewState<StatePlay>> = queueUpdates.execute(Unit)
-                .map { it.map { ItemSongSmall(Song(it)) } }
+                .map { it.map { ItemSongQueue(Song(it)) } }
                 .map(Function<List<Item>, PartialViewState<StatePlay>> { PartialStateList(it) })
                 .startWith(PartialStateEmptyList())
                 .onErrorReturn { PartialStateError(it) }
