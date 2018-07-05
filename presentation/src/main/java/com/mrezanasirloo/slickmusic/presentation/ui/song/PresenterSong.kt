@@ -2,6 +2,7 @@ package com.mrezanasirloo.slickmusic.presentation.ui.song
 
 import android.util.Log
 import com.mrezanasirloo.domain.implementation.model.Song
+import com.mrezanasirloo.domain.implementation.usecase.UseCaseAddSongToQueueImpl
 import com.mrezanasirloo.domain.implementation.usecase.UseCaseGetAllSongImpl
 import com.mrezanasirloo.domain.implementation.usecase.UseCasePlaySongsImpl
 import com.mrezanasirloo.slick.uni.PartialViewState
@@ -21,6 +22,7 @@ import javax.inject.Named
 class PresenterSong @Inject constructor(
         private val getAllSongs: UseCaseGetAllSongImpl,
         private val playSongs: UseCasePlaySongsImpl,
+        private val addSongToQueue: UseCaseAddSongToQueueImpl,
         @Named("main") main: Scheduler,
         @Named("io") io: Scheduler
 ) : SlickPresenterUni<ViewSong, StateSong>(main, io) {
@@ -39,8 +41,13 @@ class PresenterSong @Inject constructor(
                 .map(Function<Any, PartialViewState<StateSong>> { NoOp() })
                 .onErrorReturn { PartialStateError(it) }
 
+        val add: Observable<PartialViewState<StateSong>> = command { view -> view.addSongToQueue() }
+                .map { it.map { it.toSongDomain() } }
+                .flatMap { addSongToQueue.execute(it).toObservable<Any>() }
+                .map { NoOp() }
 
-        scan(StateSong(), merge(list, play))
+
+        scan(StateSong(), merge(list, play, add))
                 .doOnComplete { Log.d(TAG, "onComplete() called") }
                 .subscribe(this)
     }
@@ -65,7 +72,7 @@ data class StateSong(
         val error: Throwable? = null
 )
 
-class NoOp() : PartialViewState<StateSong> {
+class NoOp : PartialViewState<StateSong> {
     override fun reduce(state: StateSong?): StateSong {
         return state!!
     }

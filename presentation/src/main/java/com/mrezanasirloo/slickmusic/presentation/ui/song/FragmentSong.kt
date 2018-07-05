@@ -31,6 +31,10 @@ import javax.inject.Provider
  * playSongCallback an instance of this fragment.
  */
 class FragmentSong : BackStackFragment(), ViewSong {
+    override fun addSongToQueue(): Observable<Collection<Song>> {
+        return addSongToQueue
+    }
+
     override fun playSongs(): Observable<Song> {
         return playSongCallback
     }
@@ -40,6 +44,7 @@ class FragmentSong : BackStackFragment(), ViewSong {
     @Presenter
     lateinit var presenterPlay: PresenterSong
     private val playSongCallback = PublishSubject.create<Song>()
+    private val addSongToQueue = PublishSubject.create<Collection<Song>>()
 
     companion object {
         fun newInstance(): FragmentSong = FragmentSong()
@@ -68,6 +73,10 @@ class FragmentSong : BackStackFragment(), ViewSong {
         list.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         adapter.setOnItemClickListener { item, _ ->
             playSongCallback.onNext((item as ItemSongSmall).song)
+        }
+        adapter.setOnItemLongClickListener { item, _ ->
+            addSongToQueue.onNext(listOf((item as ItemSongSmall).song))
+            true
         }
     }
 
