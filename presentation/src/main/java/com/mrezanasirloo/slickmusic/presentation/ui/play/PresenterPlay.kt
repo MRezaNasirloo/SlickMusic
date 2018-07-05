@@ -3,7 +3,7 @@ package com.mrezanasirloo.slickmusic.presentation.ui.play
 import com.mrezanasirloo.domain.implementation.usecase.UseCaseGetPlaybackStateUpdatesImpl
 import com.mrezanasirloo.domain.implementation.usecase.UseCasePauseImpl
 import com.mrezanasirloo.domain.implementation.usecase.UseCasePlayImpl
-import com.mrezanasirloo.domain.implementation.usecase.UseCaseRequestPlaybackStateImpl
+import com.mrezanasirloo.domain.implementation.usecase.UseCaseSeekToImpl
 import com.mrezanasirloo.domain.model.PlaybackStateDomain
 import com.mrezanasirloo.slick.uni.PartialViewState
 import com.mrezanasirloo.slick.uni.SlickPresenterUni
@@ -22,6 +22,7 @@ class PresenterPlay @Inject constructor(
         private val getPlaybackUpdates: UseCaseGetPlaybackStateUpdatesImpl,
         private val play: UseCasePlayImpl,
         private val pause: UseCasePauseImpl,
+        private val seekTo: UseCaseSeekToImpl,
 //        private val skipToNext: UseCaseSkipToNext,
 //        private val skipToPrevious: UseCaseSkipToPrevious,
         @Named("main") main: Scheduler,
@@ -42,8 +43,11 @@ class PresenterPlay @Inject constructor(
         val pause: Observable<PartialViewState<StatePlay>> = command { view -> view.pause() }
                 .flatMap { pause.execute(Unit).toObservable<Unit>() }
                 .map { NoOp() }
+        val seek: Observable<PartialViewState<StatePlay>> = command { view -> view.seekTo() }
+                .flatMap { seekTo.execute(it).toObservable<Int>() }
+                .map { NoOp() }
 
-        subscribe(StatePlay(), merge(playbackState, play, pause))
+        subscribe(StatePlay(), merge(playbackState, play, pause, seek))
     }
 
     override fun render(state: StatePlay, view: ViewPlay) {

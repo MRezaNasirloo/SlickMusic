@@ -36,14 +36,13 @@ const val COMMAND_REQUEST_PLAYBACK_STATE = "COMMAND_REQUEST_PLAYBACK_STATE"
 @Singleton
 class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, InteractorPlaybackState, InteractorPlayback {
     private val TAG: String = MediaPlaybackController::class.java.simpleName
+
     private lateinit var mediaBrowser: MediaBrowserCompat
     private lateinit var mediaController: MediaControllerCompat
     private val mediaControllerCallback = MediaControllerCallback()
     private val connectionCallback = MediaBrowserConnectionCallback()
     private var owner: WeakReference<LifecycleOwner>? = null
-
     private val playbackState: PublishSubject<PlaybackStateDomain> = io.reactivex.subjects.PublishSubject.create()
-
 
     override fun onCreate(owner: LifecycleOwner) {
         this.owner = WeakReference(owner)
@@ -55,6 +54,7 @@ class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, 
                 null)
 
     }
+
 
     override fun onStart(owner: LifecycleOwner) {
         if (!mediaBrowser.isConnected) {
@@ -75,6 +75,7 @@ class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, 
     }
 
     inner class MediaBrowserConnectionCallback : MediaBrowserCompat.ConnectionCallback() {
+
         override fun onConnected() {
             println("$TAG.onConnected")
             if (!::mediaBrowser.isInitialized) {
@@ -97,6 +98,7 @@ class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, 
             super.onConnectionFailed()
             Log.d(TAG, "onConnectionFailed() called")
         }
+
     }
 
     inner class MediaControllerCallback : MediaControllerCompat.Callback() {
@@ -131,6 +133,7 @@ class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, 
                     state.lastPositionUpdateTime,
                     state.extras?.getParcelable<Song>("SONG")?.toSongDomain()!!)
         }
+
     }
 
     override fun requestPlaybackState(): Completable {
@@ -211,6 +214,14 @@ class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, 
     override fun previous(): Completable {
         return Completable.create {
             mediaController.transportControls.skipToPrevious()
+            it.onComplete()
+        }
+    }
+
+    override fun seekTo(position: Int): Completable {
+        return Completable.create {
+            if (mediaController.queue.isEmpty()) it.onComplete()
+            mediaController.transportControls.seekTo(position.toLong())
             it.onComplete()
         }
     }

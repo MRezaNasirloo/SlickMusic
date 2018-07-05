@@ -13,6 +13,7 @@ interface InteractorPlayback {
     fun pause(): Completable
     fun next(): Completable
     fun previous(): Completable
+    fun seekTo(position: Int): Completable
     fun addQueueSong(songs: Iterable<SongDomain>): Completable
     fun skipToQueueSong(id: Long): Completable
     fun playSongs(songs: Iterable<SongDomain>): Completable

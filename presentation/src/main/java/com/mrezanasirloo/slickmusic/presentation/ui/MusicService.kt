@@ -50,8 +50,7 @@ class MusicService : MediaBrowserServiceCompat() {
 
         // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player
         stateBuilder.setActions(ACTION_PLAY or ACTION_PLAY_PAUSE)
-        playbackState = stateBuilder.build()
-        mediaSession.setPlaybackState(playbackState)
+        setNewState(stateBuilder.build())
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
@@ -126,8 +125,7 @@ class MusicService : MediaBrowserServiceCompat() {
                     playlistSong.remove(song!!)
                 }
                 COMMAND_REQUEST_PLAYBACK_STATE -> mediaPlayer?.run {
-                    playbackState = stateBuilder.setState(playbackState?.state!!, mediaPlayer?.currentPosition?.toLong()!!, 1f).build()
-                    mediaSession.setPlaybackState(playbackState)
+                    setNewState(stateBuilder.setState(playbackState?.state!!, mediaPlayer?.currentPosition?.toLong()!!, 1f).build())
                 }
             }
         }
@@ -139,7 +137,9 @@ class MusicService : MediaBrowserServiceCompat() {
         override fun onSeekTo(pos: Long) {
             super.onSeekTo(pos)
             println("MusicService.onSeekTo")
-            TODO("Implement this")
+            if (queueIndex == -1) return
+            val newPos = playlistSong[queueIndex].duration * pos / 1000
+            mediaPlayer?.seekTo(newPos.toInt())
         }
 
         override fun onSkipToQueueItem(id: Long) {
@@ -171,6 +171,12 @@ class MusicService : MediaBrowserServiceCompat() {
             playlistSong[queueIndex].also { song ->
                 if (mediaPlayer == null) {
                     mediaPlayer = MediaPlayer()
+                    mediaPlayer?.setOnCompletionListener {
+                        setNewState(stateBuilder.setState(STATE_STOPPED, mediaPlayer?.currentPosition?.toLong()!!, 1f).build())
+                    }
+                    mediaPlayer?.setOnSeekCompleteListener {
+                        setNewState(stateBuilder.setState(playbackState?.state!!, mediaPlayer?.currentPosition?.toLong()!!, 1f).build())
+                    }
                 }
                 if (!mediaSession.isActive) {
                     mediaSession.isActive = true
@@ -200,12 +206,12 @@ class MusicService : MediaBrowserServiceCompat() {
                 }
                 mediaPlayer?.run {
                     start()
-                    playbackState = stateBuilder
+                    val playbackState = stateBuilder
                             .setState(STATE_PLAYING, mediaPlayer?.currentPosition?.toLong()!!, 1f)
                             .setExtras(Bundle().apply {
                                 putParcelable("SONG", song)
                             }).build()
-                    mediaSession.setPlaybackState(playbackState)
+                    setNewState(playbackState)
 
                     metaDataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, song.artistName)
                             .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, song.artistName)
@@ -229,9 +235,7 @@ class MusicService : MediaBrowserServiceCompat() {
                 reset()
             }
             mediaSession.isActive = false
-            playbackState = stateBuilder.setState(STATE_STOPPED, mediaPlayer?.currentPosition?.toLong()!!, 1f).build()
-            mediaSession.setPlaybackState(playbackState)
-
+            setNewState(stateBuilder.setState(STATE_STOPPED, mediaPlayer?.currentPosition?.toLong()!!, 1f).build())
         }
 
         override fun onPause() {
@@ -240,8 +244,12 @@ class MusicService : MediaBrowserServiceCompat() {
             mediaPlayer?.run {
                 pause()
             }
-            playbackState = stateBuilder.setState(STATE_PAUSED, mediaPlayer?.currentPosition?.toLong()!!, 1f).build()
-            mediaSession.setPlaybackState(playbackState)
+            setNewState(stateBuilder.setState(STATE_PAUSED, mediaPlayer?.currentPosition?.toLong()!!, 1f).build())
         }
+    }
+
+    private fun setNewState(newState: PlaybackStateCompat?) {
+        playbackState = newState
+        mediaSession.setPlaybackState(playbackState)
     }
 }

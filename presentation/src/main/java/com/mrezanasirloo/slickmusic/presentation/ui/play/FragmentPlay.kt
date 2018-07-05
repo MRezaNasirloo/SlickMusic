@@ -12,6 +12,9 @@ import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import com.jakewharton.rxbinding2.view.RxView
+import com.jakewharton.rxbinding2.widget.RxSeekBar
+import com.jakewharton.rxbinding2.widget.SeekBarStartChangeEvent
+import com.jakewharton.rxbinding2.widget.SeekBarStopChangeEvent
 import com.mrezanasirloo.domain.implementation.model.Song
 import com.mrezanasirloo.domain.model.PlaybackStateDomain
 import com.mrezanasirloo.slick.Presenter
@@ -34,18 +37,19 @@ import javax.inject.Provider
  */
 class FragmentPlay : BackStackFragment(), ViewPlay {
     private val TAG: String = FragmentPlay::class.java.simpleName
+
     private val formatter = DecimalFormat("#00.###")
     private val interpolator = LinearInterpolator()
-    private var throttleFirst: Observable<Any>? = null
-    private var objectAnimator: ObjectAnimator? = null
-
-
+    private var playPauseSignal: Observable<Any>? = null
+    private var obProgressbar: ObjectAnimator? = null
+    private var obSeekBar: ObjectAnimator? = null
     @Inject
     lateinit var provider: Provider<PresenterPlay>
+
+
     @Inject
     @Presenter
     lateinit var presenter: PresenterPlay
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         App.componentMain().inject(this)
@@ -59,31 +63,47 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
         return inflater.inflate(R.layout.fragment_play, container, false)
     }
 
+    private val seekBarEvent by lazy {
+        RxSeekBar.changeEvents(seekBar).share()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        throttleFirst = RxView.clicks(button_play_pause).throttleFirst(1, TimeUnit.SECONDS).share()
+        playPauseSignal = RxView.clicks(button_play_pause)
+                .mergeWith(RxView.clicks(button_play_pause_bottom))
+                .throttleFirst(1, TimeUnit.SECONDS).share()
+
+        seekBarEvent.ofType(SeekBarStartChangeEvent::class.java).subscribe {
+            obSeekBar?.pause()
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        throttleFirst = null
+        playPauseSignal = null
     }
 
     override fun onStop() {
         super.onStop()
-        releaseObjectAnimator()
+        releaseObjectAnimator(obProgressbar)
+        releaseObjectAnimator(obSeekBar)
     }
 
     override fun play(): Observable<Any> {
-        return throttleFirst?.filter { button_play_pause.getTag(R.id.button_play_pause) == STATE_PAUSED }!!
+        return playPauseSignal?.filter { button_play_pause.getTag(R.id.button_play_pause) == STATE_PAUSED }!!
     }
 
     override fun pause(): Observable<Any> {
-        return throttleFirst?.filter { button_play_pause.getTag(R.id.button_play_pause) == STATE_PLAYING }!!
+        return playPauseSignal?.filter { button_play_pause.getTag(R.id.button_play_pause) == STATE_PLAYING }!!
+    }
+
+    override fun seekTo(): Observable<Int> {
+        return seekBarEvent.ofType(SeekBarStopChangeEvent::class.java).map { it.view().progress }
     }
 
     override fun showError(error: Throwable) {
         Toast.makeText(context, error.message, Toast.LENGTH_LONG).show()
     }
+
 
     override fun updateState(playbackState: PlaybackStateDomain) {
         Log.d(TAG, "updateState() called with: playbackState = [$playbackState]")
@@ -91,49 +111,74 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
         when (playbackState.state) {
             STATE_NONE -> {
                 button_play_pause.setImageDrawable(null)
-                progressBar.progress = 0
+                updateProgress(0)
             }
             STATE_PLAYING -> {
-                releaseObjectAnimator()
+                releaseObjectAnimator(obProgressbar)
+                releaseObjectAnimator(obSeekBar)
+
                 val progress = (playbackState.position * 1000 / duration).toInt()
-                objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", progress, 1000)
+                obProgressbar = ObjectAnimator.ofInt(progressBar, "progress", progress, 1000)
+                obSeekBar = ObjectAnimator.ofInt(seekBar, "progress", progress, 1000)
+
+                startOb(duration, playbackState.position, obProgressbar)
+                startOb(duration, playbackState.position, obSeekBar)
+
+                updateProgress(progress)
+                updateDurationText(playbackState.position, duration)
+
+                textView_tittle.text = playbackState.song.title
+
                 button_play_pause.run {
                     setImageResource(R.drawable.ic_pause_black_24dp)
+                    button_play_pause_bottom.setImageResource(R.drawable.ic_pause_black_24dp)
                     setTag(R.id.button_play_pause, STATE_PLAYING)
-                    progressBar.progress = progress
-                    objectAnimator?.let {
-                        it.duration = duration - playbackState.position
-                        it.interpolator = interpolator
-                        it.start()
-                        it.addUpdateListener {
-                            updateDuration(it.currentPlayTime + playbackState.position, duration)
-                        }
-                    }
                 }
-                textView_tittle.text = playbackState.song.title
-                updateDuration(playbackState.position, duration)
 
             }
             STATE_PAUSED, STATE_STOPPED -> button_play_pause.run {
-                releaseObjectAnimator()
-                val progress = (playbackState.position * 1000 / duration).toInt()
                 setImageResource(R.drawable.ic_play_arrow_black_24dp)
                 setTag(R.id.button_play_pause, STATE_PAUSED)
-                progressBar.progress = progress
+                button_play_pause_bottom.setImageResource(R.drawable.ic_play_arrow_black_24dp)
+
+                val progress = (playbackState.position * 1000 / duration).toInt()
+
+                updateDurationText(playbackState.position, duration)
+                updateProgress(progress)
+
                 textView_tittle.text = playbackState.song.title
-                updateDuration(playbackState.position, duration)
+
+                releaseObjectAnimator(obSeekBar)
+                releaseObjectAnimator(obProgressbar)
             }
         }
     }
 
-    private fun releaseObjectAnimator() {
-        objectAnimator?.removeAllUpdateListeners()
-        objectAnimator?.removeAllListeners()
-        objectAnimator?.cancel()
-        objectAnimator = null
+    private fun updateProgress(progress: Int) {
+        progressBar.progress = progress
+        seekBar.progress = progress
     }
 
-    private fun updateDuration(position: Long = 0, duration: Long) {
+    private fun startOb(duration: Long, position: Long, ob: ObjectAnimator?): ObjectAnimator? {
+        return ob?.also {
+            it.duration = duration - position
+            it.interpolator = interpolator
+            it.start()
+            it.addUpdateListener {
+                updateDurationText(it.currentPlayTime + position, duration)
+            }
+        }
+    }
+
+    private fun releaseObjectAnimator(ob: ObjectAnimator?) {
+        ob?.run {
+            removeAllUpdateListeners()
+            removeAllListeners()
+            cancel()
+        }
+    }
+
+    private fun updateDurationText(position: Long = 0, duration: Long) {
         // todo don't calculate every time
         val seconds = TimeUnit.SECONDS.convert(duration, TimeUnit.MILLISECONDS)
         val minutes = TimeUnit.MINUTES.convert(duration, TimeUnit.MILLISECONDS)
@@ -161,5 +206,11 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
             fragment.arguments = args
             return fragment
         }
+    }
+}
+
+private fun <T> Observable<T>.logIt(tag: String): Observable<T> {
+    return doOnEach { notif ->
+        Log.d(tag, "logIt() called with: notif = [$notif]")
     }
 }

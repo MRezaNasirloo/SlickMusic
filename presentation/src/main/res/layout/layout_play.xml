@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="250dp"
+    android:layout_height="400dp"
     android:background="#FFF"
-    tools:layout_editor_absoluteY="25dp"
+    android:layout_gravity="bottom"
     >
     <!--tools:showIn="@layout/activity_main"-->
 
@@ -23,13 +23,54 @@
         tools:srcCompat="@drawable/ic_play_arrow_black_24dp"
         />
 
+    <ImageView
+        android:id="@+id/button_play_pause_bottom"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:tint="@color/button_dark_gray"
+        app:layout_constraintEnd_toStartOf="@+id/button_skip_next"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/button_skip_previous"
+        app:layout_constraintTop_toTopOf="@+id/button_skip_previous"
+        tools:srcCompat="@drawable/ic_play_arrow_black_24dp"
+        />
+
+    <ImageView
+        android:id="@+id/button_skip_next"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:tint="@color/button_dark_gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/button_play_pause_bottom"
+        app:layout_constraintTop_toTopOf="@+id/button_play_pause_bottom"
+        app:srcCompat="@drawable/ic_skip_next_black_24dp"
+        />
+
+    <ImageView
+        android:id="@+id/button_skip_previous"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:tint="@color/button_dark_gray"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/button_play_pause_bottom"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@drawable/ic_skip_previous_black_24dp"
+        />
+
     <ProgressBar
         android:id="@+id/progressBar"
-        android:max="1000"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="0dp"
         android:layout_height="2dp"
         android:layout_marginTop="2dp"
+        android:max="1000"
         android:progress="50"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -80,18 +121,31 @@
         tools:text="1:23 / 3:55"
         />
 
-    <ImageView
-        android:id="@+id/imageView_unused"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:layout_marginTop="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/seekBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/ic_launcher"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
+        tools:listitem="@layout/row_song_small"
         />
+
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:max="1000"
+        android:paddingStart="1dp"
+        android:paddingEnd="1dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/button_play_pause_bottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
 </android.support.constraint.ConstraintLayout>
 
     

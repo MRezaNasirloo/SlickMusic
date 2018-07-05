@@ -14,4 +14,5 @@ interface ViewPlay {
     fun updateState(playbackState: PlaybackStateDomain)
     fun play(): Observable<Any>
     fun pause(): Observable<Any>
+    fun seekTo(): Observable<Int>
 }
