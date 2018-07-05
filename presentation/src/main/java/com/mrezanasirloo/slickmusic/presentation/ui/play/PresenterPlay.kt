@@ -1,9 +1,6 @@
 package com.mrezanasirloo.slickmusic.presentation.ui.play
 
-import com.mrezanasirloo.domain.implementation.usecase.UseCaseGetPlaybackStateUpdatesImpl
-import com.mrezanasirloo.domain.implementation.usecase.UseCasePauseImpl
-import com.mrezanasirloo.domain.implementation.usecase.UseCasePlayImpl
-import com.mrezanasirloo.domain.implementation.usecase.UseCaseSeekToImpl
+import com.mrezanasirloo.domain.implementation.usecase.*
 import com.mrezanasirloo.domain.model.PlaybackStateDomain
 import com.mrezanasirloo.slick.uni.PartialViewState
 import com.mrezanasirloo.slick.uni.SlickPresenterUni
@@ -23,8 +20,8 @@ class PresenterPlay @Inject constructor(
         private val play: UseCasePlayImpl,
         private val pause: UseCasePauseImpl,
         private val seekTo: UseCaseSeekToImpl,
-//        private val skipToNext: UseCaseSkipToNext,
-//        private val skipToPrevious: UseCaseSkipToPrevious,
+        private val skipToNext: UseCaseSkipToNextImpl,
+        private val skipToPrevious: UseCaseSkipToPreviousImpl,
         @Named("main") main: Scheduler,
         @Named("io") io: Scheduler
 ) : SlickPresenterUni<ViewPlay, StatePlay>(main, io) {
@@ -46,8 +43,14 @@ class PresenterPlay @Inject constructor(
         val seek: Observable<PartialViewState<StatePlay>> = command { view -> view.seekTo() }
                 .flatMap { seekTo.execute(it).toObservable<Int>() }
                 .map { NoOp() }
+        val next: Observable<PartialViewState<StatePlay>> = command { view -> view.next() }
+                .flatMap { skipToNext.execute(Unit).toObservable<Int>() }
+                .map { NoOp() }
+        val previous: Observable<PartialViewState<StatePlay>> = command { view -> view.previous() }
+                .flatMap { skipToPrevious.execute(Unit).toObservable<Int>() }
+                .map { NoOp() }
 
-        subscribe(StatePlay(), merge(playbackState, play, pause, seek))
+        subscribe(StatePlay(), merge(playbackState, play, pause, seek, next, previous))
     }
 
     override fun render(state: StatePlay, view: ViewPlay) {

@@ -37,19 +37,28 @@ import javax.inject.Provider
  */
 class FragmentPlay : BackStackFragment(), ViewPlay {
     private val TAG: String = FragmentPlay::class.java.simpleName
-
-    private val formatter = DecimalFormat("#00.###")
-    private val interpolator = LinearInterpolator()
-    private var playPauseSignal: Observable<Any>? = null
-    private var obProgressbar: ObjectAnimator? = null
-    private var obSeekBar: ObjectAnimator? = null
     @Inject
     lateinit var provider: Provider<PresenterPlay>
-
-
     @Inject
     @Presenter
     lateinit var presenter: PresenterPlay
+
+    private val formatter = DecimalFormat("#00.###")
+
+    private val interpolator = LinearInterpolator()
+    private var obProgressbar: ObjectAnimator? = null
+    private var obSeekBar: ObjectAnimator? = null
+
+    private val playPauseSignal by lazy {
+        RxView.clicks(button_play_pause)
+                .mergeWith(RxView.clicks(button_play_pause_bottom))
+                .throttleFirst(1, TimeUnit.SECONDS).share()
+    }
+    private val seekBarEvent by lazy {
+        RxSeekBar.changeEvents(seekBar).share()
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         App.componentMain().inject(this)
@@ -63,15 +72,7 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
         return inflater.inflate(R.layout.fragment_play, container, false)
     }
 
-    private val seekBarEvent by lazy {
-        RxSeekBar.changeEvents(seekBar).share()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        playPauseSignal = RxView.clicks(button_play_pause)
-                .mergeWith(RxView.clicks(button_play_pause_bottom))
-                .throttleFirst(1, TimeUnit.SECONDS).share()
-
         seekBarEvent.ofType(SeekBarStartChangeEvent::class.java).subscribe {
             obSeekBar?.pause()
         }
@@ -79,7 +80,6 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        playPauseSignal = null
     }
 
     override fun onStop() {
@@ -94,6 +94,14 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
 
     override fun pause(): Observable<Any> {
         return playPauseSignal?.filter { button_play_pause.getTag(R.id.button_play_pause) == STATE_PLAYING }!!
+    }
+
+    override fun next(): Observable<Any> {
+        return RxView.clicks(button_skip_next).throttleFirst(500, TimeUnit.MILLISECONDS)
+    }
+
+    override fun previous(): Observable<Any> {
+        return RxView.clicks(button_skip_previous).throttleFirst(500, TimeUnit.MILLISECONDS)
     }
 
     override fun seekTo(): Observable<Int> {

@@ -153,6 +153,7 @@ class MusicService : MediaBrowserServiceCompat() {
         override fun onSkipToNext() {
             super.onSkipToNext()
             println("MusicService.onSkipToNext")
+            if (playlistQueueItem.isEmpty() || playlistQueueItem.size == 1) return
             queueIndex++
             onPrepare()
             onPlay()
@@ -161,6 +162,7 @@ class MusicService : MediaBrowserServiceCompat() {
         override fun onSkipToPrevious() {
             super.onSkipToPrevious()
             println("MusicService.onSkipToPrevious")
+            if (playlistQueueItem.isEmpty() || playlistQueueItem.size == 1) return
             queueIndex--
             onPrepare()
             onPlay()
