@@ -144,12 +144,13 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
                 obProgressbar = ObjectAnimator.ofInt(progressBar, "progress", progress, 1000)
                 obSeekBar = ObjectAnimator.ofInt(seekBar, "progress", progress, 1000)
 
-                startOb(playbackState, duration, playbackState.position, obProgressbar)
-                startOb(playbackState, duration, playbackState.position, obSeekBar)
+                startOb(duration, playbackState.position, obProgressbar)
+                startOb(duration, playbackState.position, obSeekBar)
 
                 updateProgress(progress)
+                updateDurationText(playbackState.position, duration)
 
-                textView_tittle.text = "${playbackState.song.title}\n${updateDurationText(playbackState.position, duration)}"
+                textView_tittle.text = playbackState.song.title
 
                 button_play_pause.run {
                     setImageResource(R.drawable.ic_pause_black_24dp)
@@ -164,9 +165,11 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
                 button_play_pause_bottom.setImageResource(R.drawable.ic_play_arrow_black_24dp)
 
                 val progress = (playbackState.position * 1000 / duration).toInt()
+
+                updateDurationText(playbackState.position, duration)
                 updateProgress(progress)
 
-                textView_tittle.text = "${playbackState.song.title}\n${updateDurationText(playbackState.position, duration)}"
+                textView_tittle.text = playbackState.song.title
 
                 releaseObjectAnimator(obSeekBar)
                 releaseObjectAnimator(obProgressbar)
@@ -179,14 +182,13 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
         seekBar.progress = progress
     }
 
-    private fun startOb(state: PlaybackStateDomain, duration: Long, position: Long, ob: ObjectAnimator?): ObjectAnimator? {
+    private fun startOb(duration: Long, position: Long, ob: ObjectAnimator?): ObjectAnimator? {
         return ob?.also {
             it.duration = duration - position
             it.interpolator = interpolator
             it.start()
             it.addUpdateListener {
-                textView_tittle.text = "${state.song.title}\n${updateDurationText(it.currentPlayTime + position, duration)}"
-
+                updateDurationText(it.currentPlayTime + position, duration)
             }
         }
     }
@@ -199,13 +201,13 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
         }
     }
 
-    private fun updateDurationText(position: Long = 0, duration: Long): String {
+    private fun updateDurationText(position: Long = 0, duration: Long) {
         // todo don't calculate every time
         val seconds = TimeUnit.SECONDS.convert(duration, TimeUnit.MILLISECONDS)
         val minutes = TimeUnit.MINUTES.convert(duration, TimeUnit.MILLISECONDS)
         val secondsPassed = TimeUnit.SECONDS.convert(position, TimeUnit.MILLISECONDS)
         val minutesPassed = TimeUnit.MINUTES.convert(position, TimeUnit.MILLISECONDS)
-        return "${formatter.format(minutesPassed % 60)}:${formatter.format(secondsPassed % 60)} / ${formatter.format(minutes % 60)}:${formatter.format(seconds % 60)}"
+        textView_timer?.text = "${formatter.format(minutesPassed % 60)}:${formatter.format(secondsPassed % 60)} / ${formatter.format(minutes % 60)}:${formatter.format(seconds % 60)}"
     }
 
     companion object {

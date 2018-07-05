@@ -51,16 +51,34 @@
         android:id="@+id/textView_tittle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:gravity="start|center"
         android:lineSpacingExtra="2sp"
-        android:maxLines="2"
-        android:minLines="2"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView_album_play"
+        android:maxLines="1"
+        android:minLines="1"
+        app:layout_constraintBottom_toTopOf="@+id/textView_timer"
         app:layout_constraintEnd_toStartOf="@+id/button_play_pause"
         app:layout_constraintStart_toEndOf="@+id/imageView_album_play"
         app:layout_constraintTop_toTopOf="@+id/imageView_album_play"
-        tools:text="Song Name\n01:22 / 04:23"
+        tools:text="Song Name"
+        />
+
+    <TextView
+        android:id="@+id/textView_timer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:gravity="start|center"
+        android:lineSpacingExtra="2sp"
+        android:maxLines="1"
+        android:minLines="1"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView_album_play"
+        app:layout_constraintEnd_toStartOf="@+id/button_play_pause"
+        app:layout_constraintStart_toEndOf="@+id/imageView_album_play"
+        tools:text="01:22 / 04:23"
         />
 
     <ProgressBar
