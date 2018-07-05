@@ -30,6 +30,7 @@
         android:clickable="true"
         android:elevation="16dp"
         android:outlineProvider="bounds"
+        android:visibility="invisible"
         app:behavior_hideable="false"
         app:behavior_peekHeight="@dimen/height_section_play"
         app:layout_behavior="@string/bottom_sheet_behavior"
