@@ -52,7 +52,7 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
     private val playPauseSignal by lazy {
         RxView.clicks(button_play_pause)
                 .mergeWith(RxView.clicks(button_play_pause_bottom))
-                .throttleFirst(1, TimeUnit.SECONDS).share()
+                .throttleFirst(500, TimeUnit.MILLISECONDS).share()
     }
     private val seekBarEvent by lazy {
         RxSeekBar.changeEvents(seekBar).share()
