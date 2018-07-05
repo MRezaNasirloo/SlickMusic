@@ -5,6 +5,8 @@ import android.arch.lifecycle.DefaultLifecycleObserver
 import android.arch.lifecycle.LifecycleOwner
 import android.content.ComponentName
 import android.os.Bundle
+import android.os.Handler
+import android.os.ResultReceiver
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
@@ -28,6 +30,7 @@ const val COMMAND_CLEAR_QUEUE = "COMMAND_CLEAR_QUEUE"
 const val COMMAND_ADD_QUEUE_ITEM = "COMMAND_ADD_QUEUE_ITEM"
 const val COMMAND_REMOVE_QUEUE_ITEM = "COMMAND_REMOVE_QUEUE_ITEM"
 const val COMMAND_REQUEST_PLAYBACK_STATE = "COMMAND_REQUEST_PLAYBACK_STATE"
+const val COMMAND_REQUEST_QUEUE_STATE = "COMMAND_REQUEST_QUEUE_STATE"
 
 /**
  * @author : M.Reza.Nasirloo@gmail.com
@@ -43,6 +46,7 @@ class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, 
     private val connectionCallback = MediaBrowserConnectionCallback()
     private var owner: WeakReference<LifecycleOwner>? = null
     private val playbackState: PublishSubject<PlaybackStateDomain> = io.reactivex.subjects.PublishSubject.create()
+    private val queueUpdates: PublishSubject<Collection<SongDomain>> = io.reactivex.subjects.PublishSubject.create()
 
     override fun onCreate(owner: LifecycleOwner) {
         this.owner = WeakReference(owner)
@@ -105,7 +109,15 @@ class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, 
 
         override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>?) {
             super.onQueueChanged(queue)
-            Log.d(TAG, "onQueueChanged() called with: queue = [$queue]")
+            mediaController.sendCommand(COMMAND_REQUEST_QUEUE_STATE, Bundle.EMPTY, object : ResultReceiver(Handler()) {
+                override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
+                    if (resultCode == Activity.RESULT_OK) {
+                        resultData?.getParcelableArrayList<Song>("QUEUE")?.let {
+                            queueUpdates.onNext(it.map { it.toSongDomain() })
+                        }
+                    }
+                }
+            })
         }
 
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
@@ -228,6 +240,10 @@ class MediaPlaybackController @Inject constructor() : DefaultLifecycleObserver, 
 
     override fun playbackStateUpdate(): Observable<PlaybackStateDomain> {
         return playbackState
+    }
+
+    override fun queueUpdates(): Observable<Collection<SongDomain>> {
+        return queueUpdates
     }
 
 }

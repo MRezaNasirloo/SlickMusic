@@ -1,9 +1,11 @@
 package com.mrezanasirloo.slickmusic.presentation.ui.play
 
+import com.mrezanasirloo.domain.implementation.model.Song
 import com.mrezanasirloo.domain.implementation.usecase.*
 import com.mrezanasirloo.domain.model.PlaybackStateDomain
 import com.mrezanasirloo.slick.uni.PartialViewState
 import com.mrezanasirloo.slick.uni.SlickPresenterUni
+import com.mrezanasirloo.slickmusic.presentation.ui.song.item.ItemSongSmall
 import com.xwray.groupie.kotlinandroidextensions.Item
 import io.reactivex.Observable
 import io.reactivex.Scheduler
@@ -22,6 +24,7 @@ class PresenterPlay @Inject constructor(
         private val seekTo: UseCaseSeekToImpl,
         private val skipToNext: UseCaseSkipToNextImpl,
         private val skipToPrevious: UseCaseSkipToPreviousImpl,
+        private val queueUpdates: UseCaseQueueUpdatesImpl,
         @Named("main") main: Scheduler,
         @Named("io") io: Scheduler
 ) : SlickPresenterUni<ViewPlay, StatePlay>(main, io) {
@@ -30,6 +33,13 @@ class PresenterPlay @Inject constructor(
         @Suppress("RedundantSamConstructor")
         val playbackState: Observable<PartialViewState<StatePlay>> = getPlaybackUpdates.execute(Unit)
                 .map(Function<PlaybackStateDomain, PartialViewState<StatePlay>> { PartialPlaybackState(it) })
+                .startWith(PartialStateEmptyList())
+                .onErrorReturn { PartialStateError(it) }
+
+        @Suppress("RedundantSamConstructor")
+        val queueUpdates: Observable<PartialViewState<StatePlay>> = queueUpdates.execute(Unit)
+                .map { it.map { ItemSongSmall(Song(it)) } }
+                .map(Function<List<Item>, PartialViewState<StatePlay>> { PartialStateList(it) })
                 .startWith(PartialStateEmptyList())
                 .onErrorReturn { PartialStateError(it) }
 
@@ -50,12 +60,13 @@ class PresenterPlay @Inject constructor(
                 .flatMap { skipToPrevious.execute(Unit).toObservable<Int>() }
                 .map { NoOp() }
 
-        subscribe(StatePlay(), merge(playbackState, play, pause, seek, next, previous))
+        subscribe(StatePlay(), merge(playbackState, queueUpdates, play, pause, seek, next, previous))
     }
 
     override fun render(state: StatePlay, view: ViewPlay) {
         view.apply {
             updateState(state.playbackState)
+            updateQueue(state.list)
             state.error?.let {
                 //TODO Handle errors here
                 showError(it)

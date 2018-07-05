@@ -5,6 +5,9 @@ import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.media.session.PlaybackStateCompat.*
+import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +25,9 @@ import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.App
 import com.mrezanasirloo.slickmusic.presentation.ui.main.BackStackFragment
 import com.mrezanasirloo.slickmusic.presentation.ui.song.model.Album
+import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.kotlinandroidextensions.Item
+import com.xwray.groupie.kotlinandroidextensions.ViewHolder
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.layout_play.*
 import java.text.DecimalFormat
@@ -37,27 +43,28 @@ import javax.inject.Provider
  */
 class FragmentPlay : BackStackFragment(), ViewPlay {
     private val TAG: String = FragmentPlay::class.java.simpleName
+
     @Inject
     lateinit var provider: Provider<PresenterPlay>
     @Inject
     @Presenter
     lateinit var presenter: PresenterPlay
-
     private val formatter = DecimalFormat("#00.###")
 
     private val interpolator = LinearInterpolator()
+
     private var obProgressbar: ObjectAnimator? = null
     private var obSeekBar: ObjectAnimator? = null
-
+    private val adapter: GroupAdapter<ViewHolder> = GroupAdapter()
     private val playPauseSignal by lazy {
         RxView.clicks(button_play_pause)
                 .mergeWith(RxView.clicks(button_play_pause_bottom))
                 .throttleFirst(500, TimeUnit.MILLISECONDS).share()
     }
+
     private val seekBarEvent by lazy {
         RxSeekBar.changeEvents(seekBar).share()
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +75,7 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
         }
     }
 
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_play, container, false)
     }
@@ -76,6 +84,9 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
         seekBarEvent.ofType(SeekBarStartChangeEvent::class.java).subscribe {
             obSeekBar?.pause()
         }
+        list_queue.adapter = adapter
+        list_queue.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        list_queue.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
     }
 
     override fun onDestroyView() {
@@ -106,6 +117,10 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
 
     override fun seekTo(): Observable<Int> {
         return seekBarEvent.ofType(SeekBarStopChangeEvent::class.java).map { it.view().progress }
+    }
+
+    override fun updateQueue(list: List<Item>) {
+        adapter.update(list)
     }
 
     override fun showError(error: Throwable) {

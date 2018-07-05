@@ -1,5 +1,6 @@
 package com.mrezanasirloo.slickmusic.presentation.ui
 
+import android.app.Activity
 import android.content.Intent
 import android.media.AudioManager
 import android.media.MediaPlayer
@@ -14,10 +15,7 @@ import android.support.v4.media.session.MediaSessionCompat.*
 import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v4.media.session.PlaybackStateCompat.*
 import android.util.Log
-import com.mrezanasirloo.domain.implementation.COMMAND_ADD_QUEUE_ITEM
-import com.mrezanasirloo.domain.implementation.COMMAND_CLEAR_QUEUE
-import com.mrezanasirloo.domain.implementation.COMMAND_REMOVE_QUEUE_ITEM
-import com.mrezanasirloo.domain.implementation.COMMAND_REQUEST_PLAYBACK_STATE
+import com.mrezanasirloo.domain.implementation.*
 import com.mrezanasirloo.domain.implementation.model.Song
 import com.mrezanasirloo.slickmusic.R
 import java.util.*
@@ -132,6 +130,13 @@ class MusicService : MediaBrowserServiceCompat() {
 
         override fun onCommand(command: String?, extras: Bundle?, cb: ResultReceiver?) {
             Log.d(TAG, "onCommand() called with: command = [$command], extras = [$extras], cb = [$cb]")
+            when (command) {
+                COMMAND_REQUEST_QUEUE_STATE -> {
+                    cb?.send(Activity.RESULT_OK, Bundle().also {
+                        it.putParcelableArrayList("QUEUE", playlistSong)
+                    })
+                }
+            }
         }
 
         override fun onSeekTo(pos: Long) {
