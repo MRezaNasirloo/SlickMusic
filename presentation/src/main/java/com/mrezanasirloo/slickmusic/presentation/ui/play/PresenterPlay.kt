@@ -60,7 +60,11 @@ class PresenterPlay @Inject constructor(
                 .flatMap { skipToPrevious.execute(Unit).toObservable<Int>() }
                 .map { NoOp() }
 
-        subscribe(StatePlay(), merge(playbackState, queueUpdates, play, pause, seek, next, previous))
+        scan(StatePlay(), merge(playbackState, queueUpdates, play, pause, seek, next, previous))
+                .doOnComplete {
+                    throw RuntimeException("Update Stream terminated")
+                }
+                .subscribe(this)
     }
 
     override fun render(state: StatePlay, view: ViewPlay) {

@@ -23,6 +23,7 @@ import com.mrezanasirloo.domain.model.PlaybackStateDomain
 import com.mrezanasirloo.slick.Presenter
 import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.App
+import com.mrezanasirloo.slickmusic.presentation.ui.main.ActivityMain
 import com.mrezanasirloo.slickmusic.presentation.ui.main.BackStackFragment
 import com.mrezanasirloo.slickmusic.presentation.ui.song.model.Album
 import com.xwray.groupie.GroupAdapter
@@ -84,6 +85,12 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
         seekBarEvent.ofType(SeekBarStartChangeEvent::class.java).subscribe {
             obSeekBar?.pause()
         }
+
+        imageView_album_play.setOnClickListener {
+            //TODO extract interface
+            (activity as ActivityMain).toggleBottomSheet()
+        }
+
         list_queue.adapter = adapter
         list_queue.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         list_queue.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))

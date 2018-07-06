@@ -188,6 +188,13 @@
             />
     </android.support.constraint.ConstraintLayout>
 
+    <android.support.constraint.Group
+        android:id="@+id/play_back_info_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="textView_timer,imageView_album_play,textView_tittle,progressBar"
+        />
+
 
 </android.support.constraint.ConstraintLayout>
 

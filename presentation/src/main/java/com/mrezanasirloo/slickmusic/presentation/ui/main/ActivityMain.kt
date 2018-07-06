@@ -6,6 +6,8 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.BottomSheetBehavior
+import android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED
+import android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -25,7 +27,6 @@ import com.mrezanasirloo.slickmusic.presentation.openAppSettingPage
 import com.mrezanasirloo.slickmusic.presentation.ui.album.FragmentAlbum
 import com.mrezanasirloo.slickmusic.presentation.ui.play.FragmentPlay
 import com.mrezanasirloo.slickmusic.presentation.ui.song.FragmentSong
-import com.mrezanasirloo.domain.implementation.model.Song
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
@@ -74,12 +75,12 @@ class ActivityMain : AppCompatActivity(), ViewMain {
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         if (event.action == MotionEvent.ACTION_DOWN) {
-            if (bottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED) {
+            if (bottomSheetBehavior?.state == STATE_EXPANDED) {
                 val outRect = Rect()
                 container_play.getGlobalVisibleRect(outRect)
 
                 if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt()))
-                    bottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
+                    bottomSheetBehavior?.state = STATE_COLLAPSED
             }
         }
 
@@ -129,6 +130,10 @@ class ActivityMain : AppCompatActivity(), ViewMain {
         button.setOnClickListener {
             requestPermission.onNext(1)
         }
+    }
+
+    fun toggleBottomSheet() {
+        if (bottomSheetBehavior?.state == STATE_EXPANDED) bottomSheetBehavior?.state = STATE_COLLAPSED else bottomSheetBehavior?.state = STATE_EXPANDED
     }
 
     override fun commandPermission(): Observable<Any> {
