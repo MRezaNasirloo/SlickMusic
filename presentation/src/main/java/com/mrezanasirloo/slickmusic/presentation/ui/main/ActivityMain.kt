@@ -93,6 +93,7 @@ class ActivityMain : AppCompatActivity(), ViewMain {
         navigation.visibility = VISIBLE
         container_play.visibility = VISIBLE
         view_pager.visibility = VISIBLE
+        if (view_pager.adapter != null) return
         view_pager.offscreenPageLimit = 2
         view_pager.adapter = Pager(supportFragmentManager)
         navigation.setOnNavigationItemSelectedListener(BottomNavListener())
