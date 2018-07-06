@@ -79,8 +79,10 @@ class ActivityMain : AppCompatActivity(), ViewMain {
                 val outRect = Rect()
                 container_play.getGlobalVisibleRect(outRect)
 
-                if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt()))
+                if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
                     bottomSheetBehavior?.state = STATE_COLLAPSED
+                    return true
+                }
             }
         }
 
