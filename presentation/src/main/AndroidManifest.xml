@@ -5,6 +5,7 @@
     >
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
@@ -43,12 +44,11 @@
             android:value="GlideModule"
             />
 
-        <activity android:name=".presentation.ui.tageditor.ActivityTagEditor">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <activity
+            android:name=".presentation.ui.tageditor.ActivityTagEditor"
+            android:theme="@style/AppTheme.ActionBar"
+            >
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 

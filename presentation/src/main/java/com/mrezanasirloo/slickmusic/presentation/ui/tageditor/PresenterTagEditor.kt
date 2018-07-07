@@ -28,7 +28,12 @@ class PresenterTagEditor @Inject constructor(
                 .map(Function<SongTagDomain, PartialViewState<StateTagEditor>> { PartialSongData(it) })
                 .onErrorReturn { PartialError(it) }
 
-        scan(StateTagEditor(), data).subscribe(this)
+        val save: Observable<PartialViewState<StateTagEditor>> = command { v -> v.save() }
+                .flatMap { repositoryID3Tag.updateId3Tag(it).subscribeOn(io) }
+                .map(Function<SongTagDomain, PartialViewState<StateTagEditor>> { PartialSongData(it) })
+                .onErrorReturn { PartialError(it) }
+
+        scan(StateTagEditor(), merge(data, save)).subscribe(this)
     }
 
     override fun render(state: StateTagEditor, view: ViewTagEditor) {

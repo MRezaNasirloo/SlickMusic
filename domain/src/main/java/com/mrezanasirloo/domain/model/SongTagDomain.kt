@@ -8,5 +8,6 @@ data class SongTagDomain(
         val songDomain: SongDomain,
         val genre: String,
         val year: String = "",
+        val track: String = "",
         val byte: ByteArray?
 )

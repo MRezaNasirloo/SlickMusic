@@ -6,7 +6,7 @@ import android.content.Context
 import com.mrezanasirloo.domain.usecase.UseCasePermissionReadExternalStorage
 import com.vanniktech.rxpermission.Permission
 import com.vanniktech.rxpermission.RealRxPermission
-import io.reactivex.Single
+import io.reactivex.Observable
 import javax.inject.Inject
 
 /**
@@ -14,10 +14,10 @@ import javax.inject.Inject
  *         Created on: 2018-06-10
  */
 class UseCasePermissionReadExternalStorageImpl @Inject constructor(private val context: Context)
-    : UseCasePermissionReadExternalStorage<Unit, Single<Permission>>() {
+    : UseCasePermissionReadExternalStorage<Unit, Observable<Permission>>() {
 
-    override fun execute(parameter: Unit): Single<Permission> {
+    override fun execute(parameter: Unit): Observable<Permission> {
         return RealRxPermission.getInstance(context.applicationContext as Application)
-                .request(Manifest.permission.READ_EXTERNAL_STORAGE)
+                .requestEach(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
     }
 }

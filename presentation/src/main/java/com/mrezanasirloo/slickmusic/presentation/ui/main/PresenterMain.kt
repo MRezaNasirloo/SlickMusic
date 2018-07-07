@@ -19,7 +19,7 @@ class PresenterMain @Inject constructor(
         @Suppress("RedundantSamConstructor")
         val permission: Observable<PartialViewState<StateMain>> = command(ViewMain::commandPermission)
                 .startWith(1)
-                .flatMap { readPermission.execute(Unit).toObservable() }
+                .flatMap { readPermission.execute(Unit) }
                 .map(Function<Permission, PartialViewState<StateMain>> { PartialStatePermission(it.state()) })
                 .onErrorReturn { PartialStateError(it) }
 
