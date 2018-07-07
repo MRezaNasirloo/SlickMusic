@@ -1,1 +1,1 @@
-include ':presentation', ':data', ':domain', ':domain-implementation'
+include ':presentation', ':data', ':domain', ':domain-implementation', ':tag-editor'

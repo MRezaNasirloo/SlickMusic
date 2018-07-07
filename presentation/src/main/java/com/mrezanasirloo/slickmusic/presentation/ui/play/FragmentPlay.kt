@@ -47,7 +47,6 @@ class FragmentPlay : BackStackFragment(), ViewPlay {
 
     @Inject
     lateinit var provider: Provider<PresenterPlay>
-    @Inject
     @Presenter
     lateinit var presenter: PresenterPlay
     private val formatter = DecimalFormat("#00.###")

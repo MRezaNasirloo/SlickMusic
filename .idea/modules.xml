@@ -7,6 +7,7 @@
       <module fileurl="file://$PROJECT_DIR$/domain/domain.iml" filepath="$PROJECT_DIR$/domain/domain.iml" />
       <module fileurl="file://$PROJECT_DIR$/domain-implementation/domain-implementation.iml" filepath="$PROJECT_DIR$/domain-implementation/domain-implementation.iml" />
       <module fileurl="file://$PROJECT_DIR$/presentation/presentation.iml" filepath="$PROJECT_DIR$/presentation/presentation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tag-editor/tag-editor.iml" filepath="$PROJECT_DIR$/tag-editor/tag-editor.iml" />
     </modules>
   </component>
 </project>
