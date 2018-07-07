@@ -7,5 +7,6 @@ package com.mrezanasirloo.domain.model
 data class SongTagDomain(
         val songDomain: SongDomain,
         val genre: String,
+        val year: String = "",
         val byte: ByteArray?
 )

@@ -6,6 +6,7 @@ import com.mrezanasirloo.slick.uni.PartialViewState
 import com.mrezanasirloo.slick.uni.SlickPresenterUni
 import io.reactivex.Observable
 import io.reactivex.Scheduler
+import io.reactivex.functions.Function
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -24,20 +25,30 @@ class PresenterTagEditor @Inject constructor(
         val song = view.song()
 
         val data: Observable<PartialViewState<StateTagEditor>> = repositoryID3Tag.readId3Tag(song.toSongDomain())
-                .map { PartialSongData(it) }
+                .map(Function<SongTagDomain, PartialViewState<StateTagEditor>> { PartialSongData(it) })
+                .onErrorReturn { PartialError(it) }
 
         scan(StateTagEditor(), data).subscribe(this)
     }
 
     override fun render(state: StateTagEditor, view: ViewTagEditor) {
-
+        state.songTagDomain?.let {
+            view.showSong(it)
+        }
+        state.error?.printStackTrace()
     }
 }
 
-data class StateTagEditor(val songTagDomain: SongTagDomain? = null)
+data class StateTagEditor(val songTagDomain: SongTagDomain? = null, val error: Throwable? = null)
 
 class PartialSongData(private val songTagDomain: SongTagDomain) : PartialViewState<StateTagEditor> {
     override fun reduce(state: StateTagEditor?): StateTagEditor {
         return state!!.copy(songTagDomain = songTagDomain)
+    }
+}
+
+class PartialError(private val error: Throwable?) : PartialViewState<StateTagEditor> {
+    override fun reduce(state: StateTagEditor?): StateTagEditor {
+        return state!!.copy(error = error)
     }
 }

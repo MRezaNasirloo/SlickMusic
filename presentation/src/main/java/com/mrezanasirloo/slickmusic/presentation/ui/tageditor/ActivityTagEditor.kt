@@ -1,5 +1,7 @@
 package com.mrezanasirloo.slickmusic.presentation.ui.tageditor
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -15,14 +17,24 @@ import javax.inject.Provider
 const val ARG_SONG = "ARG_SONG"
 
 class ActivityTagEditor : AppCompatActivity(), ViewTagEditor {
+
+    companion object {
+        fun start(context: Context, song: Song): Unit {
+            val intent = Intent(context, ActivityTagEditor::class.java).also {
+                it.putExtra(ARG_SONG, song)
+            }
+            context.startActivity(intent)
+        }
+    }
+
     override fun showSong(songTag: SongTagDomain) {
         val song = songTag.songDomain
         editText_song.setText(song.title)
         editText_artist.setText(song.artistName)
         editText_album.setText(song.albumName)
         editText_genre.setText(songTag.genre)
-        editText_track.setText(song.trackNumber)
-        editText_year.setText(song.year)
+        editText_track.setText(song.trackNumber.toString())
+        editText_year.setText(song.year.toString())
         songTag.byte?.let {
             imageView.setImageBitmap(BitmapFactory.decodeByteArray(it, 0, it.size))
         }

@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import android.widget.Toast
 import com.mrezanasirloo.domain.implementation.model.Song
 import com.mrezanasirloo.slick.Presenter
@@ -15,6 +16,7 @@ import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.App
 import com.mrezanasirloo.slickmusic.presentation.ui.main.BackStackFragment
 import com.mrezanasirloo.slickmusic.presentation.ui.song.item.ItemSongSmall
+import com.mrezanasirloo.slickmusic.presentation.ui.tageditor.ActivityTagEditor
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.Item
 import com.xwray.groupie.kotlinandroidextensions.ViewHolder
@@ -56,30 +58,42 @@ class FragmentSong : BackStackFragment(), ViewSong {
         PresenterSong_Slick.bind(this)
     }
 
-    override fun onDetach() {
-        super.onDetach()
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_song, container, false)
     }
 
     private val adapter: GroupAdapter<ViewHolder> = GroupAdapter()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onViewCreated(parent: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(parent, savedInstanceState)
         list.adapter = adapter
         list.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         list.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-        adapter.setOnItemClickListener { item, _ ->
-            playSongCallback.onNext((item as ItemSongSmall).song)
-        }
-        adapter.setOnItemLongClickListener { item, _ ->
-            addSongToQueue.onNext(listOf((item as ItemSongSmall).song))
-            true
+        adapter.setOnItemClickListener { item, view ->
+            when (view.id) {
+                R.id.button_option -> {
+                    val popupMenu = PopupMenu(context, view)
+                    popupMenu.inflate(R.menu.menu_option)
+                    popupMenu.setOnMenuItemClickListener {
+                        when (it.itemId) {
+                            R.id.action_add_to_queue -> {
+                                addSongToQueue.onNext(listOf((item as ItemSongSmall).song))
+                                return@setOnMenuItemClickListener true
+                            }
+                            R.id.action_edit_tag -> {
+                                ActivityTagEditor.start(context!!, (item as ItemSongSmall).song)
+                                return@setOnMenuItemClickListener true
+                            }
+                            else -> return@setOnMenuItemClickListener false
+                        }
+                    }
+                    popupMenu.show()
+                }
+                else -> playSongCallback.onNext((item as ItemSongSmall).song)
+            }
+
         }
     }
-
 
     override fun update(list: List<Item>) {
         adapter.update(list)
