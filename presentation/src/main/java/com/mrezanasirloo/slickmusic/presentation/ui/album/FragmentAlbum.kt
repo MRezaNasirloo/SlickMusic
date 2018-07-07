@@ -47,7 +47,7 @@ class FragmentAlbum : BackStackFragment(), ViewAlbum {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_song, container, false)
+        return inflater.inflate(R.layout.fragment_album, container, false)
     }
 
     private val adapter: GroupAdapter<ViewHolder> = GroupAdapter()

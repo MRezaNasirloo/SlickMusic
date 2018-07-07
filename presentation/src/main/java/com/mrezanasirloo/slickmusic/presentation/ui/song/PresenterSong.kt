@@ -41,13 +41,31 @@ class PresenterSong @Inject constructor(
                 .map(Function<Any, PartialViewState<StateSong>> { NoOp() })
                 .onErrorReturn { PartialStateError(it) }
 
+        @Suppress("RedundantSamConstructor")
+        val search: Observable<PartialViewState<StateSong>> = command { view -> view.search() }
+                .flatMap { term ->
+                    Observable.fromIterable(oldState?.list)
+                            .filter {
+                                it as ItemSongSmall
+                                val song = it.song
+                                song.artistName.contains(term, true) || song.albumName.contains(term, true) || song.title.contains(term, true)
+                            }.toList().toObservable()
+                }
+                .map(Function<List<Item>, PartialViewState<StateSong>> { PartialStateSearchResult(it) })
+                .onErrorReturn { PartialStateError(it) }
+
+        @Suppress("RedundantSamConstructor")
+        val searchClose: Observable<PartialViewState<StateSong>> = command { view -> view.searchClose() }
+                .map { emptyList<Item>() }
+                .map { PartialStateSearchResult(emptyList()) }
+
         val add: Observable<PartialViewState<StateSong>> = command { view -> view.addSongToQueue() }
                 .map { it.map { it.toSongDomain() } }
                 .flatMap { addSongToQueue.execute(it).toObservable<Any>() }
                 .map { NoOp() }
 
 
-        scan(StateSong(), merge(list, play, add))
+        scan(StateSong(), merge(list, play, add, search, searchClose))
                 .doOnComplete { Log.d(TAG, "onComplete() called") }
                 .subscribe(this)
     }
@@ -55,10 +73,12 @@ class PresenterSong @Inject constructor(
     private val TAG: String = this::class.java.simpleName
 
 
+    var oldState: StateSong? = null
     override fun render(state: StateSong, view: ViewSong) {
+        oldState = state
         println("list = [${state.list.size}], error = [${state.error}] view = [$view]")
         view.apply {
-            view.update(state.list)
+            if (!state.search.isEmpty()) view.update(state.search) else view.update(state.list)
             state.error?.let {
                 //TODO Handle errors here
                 showError(it)
@@ -69,6 +89,7 @@ class PresenterSong @Inject constructor(
 
 data class StateSong(
         val list: List<Item> = emptyList(),
+        val search: List<Item> = emptyList(),
         val error: Throwable? = null
 )
 
@@ -81,6 +102,12 @@ class NoOp : PartialViewState<StateSong> {
 class PartialStateList(private val list: List<Item>) : PartialViewState<StateSong> {
     override fun reduce(state: StateSong?): StateSong {
         return state!!.copy(list = list)
+    }
+}
+
+class PartialStateSearchResult(private val list: List<Item>) : PartialViewState<StateSong> {
+    override fun reduce(state: StateSong?): StateSong {
+        return state!!.copy(search = list)
     }
 }
 

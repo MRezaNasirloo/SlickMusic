@@ -12,5 +12,7 @@ interface ViewSong {
     fun update(list: List<Item>)
     fun showError(error: Throwable)
     fun playSongs(): Observable<Song>
+    fun search(): Observable<String>
+    fun searchClose(): Observable<Any>
     fun addSongToQueue(): Observable<Collection<Song>>
 }

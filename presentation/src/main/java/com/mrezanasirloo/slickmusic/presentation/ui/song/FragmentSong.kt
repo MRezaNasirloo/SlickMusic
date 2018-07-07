@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.SearchView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,6 +34,14 @@ import javax.inject.Provider
  * playSongCallback an instance of this fragment.
  */
 class FragmentSong : BackStackFragment(), ViewSong {
+    override fun searchClose(): Observable<Any> {
+        return searchCloseCallback
+    }
+
+    override fun search(): Observable<String> {
+        return searchCallback
+    }
+
     override fun addSongToQueue(): Observable<Collection<Song>> {
         return addSongToQueue
     }
@@ -46,6 +55,8 @@ class FragmentSong : BackStackFragment(), ViewSong {
     @Presenter
     lateinit var presenterPlay: PresenterSong
     private val playSongCallback = PublishSubject.create<Song>()
+    private val searchCallback = PublishSubject.create<String>()
+    private val searchCloseCallback = PublishSubject.create<Any>()
     private val addSongToQueue = PublishSubject.create<Collection<Song>>()
 
     companion object {
@@ -92,6 +103,28 @@ class FragmentSong : BackStackFragment(), ViewSong {
                 else -> playSongCallback.onNext((item as ItemSongSmall).song)
             }
 
+        }
+
+        search_view.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                newText?.let {
+                    if (newText.isEmpty()) {
+                        searchCallback.onNext("")
+                        return true
+                    }
+                    searchCallback.onNext(newText)
+                }
+                return true
+            }
+        })
+
+        search_view.setOnCloseListener {
+            searchCloseCallback.onNext(1)
+            return@setOnCloseListener true
         }
     }
 
