@@ -5,6 +5,7 @@ package com.mrezanasirloo.domain.model
  *         Created on: 2018-06-09
  */
 data class SongDomain(
+        val dbId: Int = -1,
         val id: Int = -1,
         val title: String = "",
         val trackNumber: Int = -1,

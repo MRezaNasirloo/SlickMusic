@@ -100,6 +100,7 @@ class ActivityTagEditor : AppCompatActivity(), ViewTagEditor {
                 Log.d(TAG, "onOptionsItemSelected: ")
                 val songTagDomain = SongTagDomain(
                         Song(
+                                song.dbId,
                                 song.id,
                                 editText_song.text.toString(),
                                 song.trackNumber,

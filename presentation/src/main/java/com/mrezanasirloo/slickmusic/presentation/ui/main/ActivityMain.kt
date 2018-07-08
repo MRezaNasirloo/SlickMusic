@@ -26,6 +26,7 @@ import com.mrezanasirloo.slickmusic.presentation.App
 import com.mrezanasirloo.slickmusic.presentation.openAppSettingPage
 import com.mrezanasirloo.slickmusic.presentation.ui.album.FragmentAlbum
 import com.mrezanasirloo.slickmusic.presentation.ui.play.FragmentPlay
+import com.mrezanasirloo.slickmusic.presentation.ui.song.FragmentFavorite
 import com.mrezanasirloo.slickmusic.presentation.ui.song.FragmentSong
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -179,13 +180,13 @@ class Pager(fm: FragmentManager?) : FragmentPagerAdapter(fm) {
         return when (position) {
             0 -> FragmentAlbum.newInstance()
             1 -> FragmentSong.newInstance()
-            2 -> TODO("FragmentFavorite Not Implemented")
+            2 -> FragmentFavorite.newInstance()
             else -> throw IllegalStateException()
         }
     }
 
     override fun getCount(): Int {
-        return 2
+        return 3
     }
 }
 

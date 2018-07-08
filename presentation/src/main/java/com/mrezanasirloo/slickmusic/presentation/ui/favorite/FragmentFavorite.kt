@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.SearchView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +14,7 @@ import com.mrezanasirloo.domain.implementation.model.Song
 import com.mrezanasirloo.slick.Presenter
 import com.mrezanasirloo.slickmusic.R
 import com.mrezanasirloo.slickmusic.presentation.App
+import com.mrezanasirloo.slickmusic.presentation.ui.favorite.ViewFavorite
 import com.mrezanasirloo.slickmusic.presentation.ui.main.BackStackFragment
 import com.mrezanasirloo.slickmusic.presentation.ui.song.item.ItemSongSmall
 import com.mrezanasirloo.slickmusic.presentation.ui.tageditor.ActivityTagEditor
@@ -24,6 +24,7 @@ import com.xwray.groupie.kotlinandroidextensions.ViewHolder
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_song.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -33,17 +34,15 @@ import javax.inject.Provider
  * Use the [FragmentSong.newInstance] factory method to
  * playSongCallback an instance of this fragment.
  */
-class FragmentSong : BackStackFragment(), ViewSong {
-    override fun addToFavorite(): Observable<Song> {
-        return add
+class FragmentFavorite : BackStackFragment(), ViewFavorite {
+
+    override fun removeFromFavorite(): Observable<Song> {
+        return remove.share()
     }
 
-    override fun searchClose(): Observable<Any> {
-        return searchCloseCallback
-    }
-
-    override fun search(): Observable<String> {
-        return searchCallback
+    override fun triggerLoad(): Observable<Any> {
+        return remove.cast(Any::class.java).mergeWith(onAddListener).delay(300, TimeUnit.MILLISECONDS)
+                .cast(Any::class.java)
     }
 
     override fun addSongToQueue(): Observable<Collection<Song>> {
@@ -55,27 +54,28 @@ class FragmentSong : BackStackFragment(), ViewSong {
     }
 
     @Inject
-    lateinit var provider: Provider<PresenterSong>
+    lateinit var provider: Provider<PresenterFavorite>
     @Presenter
-    lateinit var presenterPlay: PresenterSong
-    private val add = PublishSubject.create<Song>()
+    lateinit var presenterPlay: PresenterFavorite
     private val playSongCallback = PublishSubject.create<Song>()
+    private val remove = PublishSubject.create<Song>()
     private val searchCallback = PublishSubject.create<String>()
     private val searchCloseCallback = PublishSubject.create<Any>()
     private val addSongToQueue = PublishSubject.create<Collection<Song>>()
 
     companion object {
-        fun newInstance(): FragmentSong = FragmentSong()
+        fun newInstance(): FragmentFavorite = FragmentFavorite()
+        val onAddListener = PublishSubject.create<Any>()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         App.componentMain().inject(this)
-        PresenterSong_Slick.bind(this)
+        PresenterFavorite_Slick.bind(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_song, container, false)
+        return inflater.inflate(R.layout.fragment_favorite, container, false)
     }
 
     private val adapter: GroupAdapter<ViewHolder> = GroupAdapter()
@@ -89,7 +89,7 @@ class FragmentSong : BackStackFragment(), ViewSong {
             when (view.id) {
                 R.id.button_option -> {
                     val popupMenu = PopupMenu(context, view)
-                    popupMenu.inflate(R.menu.menu_option)
+                    popupMenu.inflate(R.menu.menu_option_favorite)
                     popupMenu.setOnMenuItemClickListener {
                         when (it.itemId) {
                             R.id.action_add_to_queue -> {
@@ -100,9 +100,8 @@ class FragmentSong : BackStackFragment(), ViewSong {
                                 ActivityTagEditor.start(context!!, (item as ItemSongSmall).song)
                                 return@setOnMenuItemClickListener true
                             }
-                            R.id.action_add_to_favorite -> {
-                                add.onNext((item as ItemSongSmall).song)
-                                FragmentFavorite.onAddListener.onNext(1)
+                            R.id.action_remove_favorite -> {
+                                remove.onNext((item as ItemSongSmall).song)
                                 return@setOnMenuItemClickListener true
                             }
                             else -> return@setOnMenuItemClickListener false
@@ -113,28 +112,6 @@ class FragmentSong : BackStackFragment(), ViewSong {
                 else -> playSongCallback.onNext((item as ItemSongSmall).song)
             }
 
-        }
-
-        search_view.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                newText?.let {
-                    if (newText.isEmpty()) {
-                        searchCallback.onNext("")
-                        return true
-                    }
-                    searchCallback.onNext(newText)
-                }
-                return true
-            }
-        })
-
-        search_view.setOnCloseListener {
-            searchCloseCallback.onNext(1)
-            return@setOnCloseListener true
         }
     }
 

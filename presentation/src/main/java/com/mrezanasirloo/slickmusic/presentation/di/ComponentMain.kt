@@ -3,6 +3,7 @@ package com.mrezanasirloo.slickmusic.presentation.di
 import com.mrezanasirloo.slickmusic.presentation.ui.album.FragmentAlbum
 import com.mrezanasirloo.slickmusic.presentation.ui.main.ActivityMain
 import com.mrezanasirloo.slickmusic.presentation.ui.play.FragmentPlay
+import com.mrezanasirloo.slickmusic.presentation.ui.song.FragmentFavorite
 import com.mrezanasirloo.slickmusic.presentation.ui.song.FragmentSong
 import com.mrezanasirloo.slickmusic.presentation.ui.tageditor.ActivityTagEditor
 import dagger.Subcomponent
@@ -14,6 +15,7 @@ interface ComponentMain {
     fun inject(activityMain: ActivityMain)
     fun inject(fragmentPlay: FragmentPlay)
     fun inject(activityTagEditor: ActivityTagEditor)
+    fun inject(fragmentFavorite: FragmentFavorite)
 
     @Subcomponent.Builder
     interface Builder {

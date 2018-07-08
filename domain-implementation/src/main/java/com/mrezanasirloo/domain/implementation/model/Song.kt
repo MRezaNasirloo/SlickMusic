@@ -10,6 +10,7 @@ import kotlinx.android.parcel.Parcelize
  */
 @Parcelize
 data class Song(
+        val dbId: Int,
         val id: Int,
         val title: String,
         val trackNumber: Int,
@@ -23,6 +24,7 @@ data class Song(
         val artistName: String
 ) : Parcelable {
     constructor(sd: SongDomain) : this(
+            sd.dbId,
             sd.id,
             sd.title,
             sd.trackNumber,
@@ -36,5 +38,5 @@ data class Song(
             sd.artistName
     )
 
-    fun toSongDomain(): SongDomain = SongDomain(id, title, trackNumber, year, duration, data, dateModified, albumId, albumName, artistId, artistName)
+    fun toSongDomain(): SongDomain = SongDomain(dbId, id, title, trackNumber, year, duration, data, dateModified, albumId, albumName, artistId, artistName)
 }

@@ -18,6 +18,7 @@ class RepositoryID3Tag @Inject constructor(
         val tag = AudioFileIO.read(File(songDomain.data)).tagOrCreateAndSetDefault
         return SongTagDomain(
                 SongDomain(
+                        -1,
                         songDomain.id,
                         tag.getFirst(FieldKey.TITLE),
                         songDomain.trackNumber,

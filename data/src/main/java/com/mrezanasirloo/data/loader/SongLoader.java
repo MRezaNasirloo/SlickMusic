@@ -92,7 +92,7 @@ public class SongLoader {
         final int artistId = cursor.getInt(9);
         final String artistName = cursor.getString(10);
 
-        return new SongDomain(id, title, trackNumber, year, duration, data, dateModified, albumId, albumName, artistId, artistName);
+        return new SongDomain(-1, id, title, trackNumber, year, duration, data, dateModified, albumId, albumName, artistId, artistName);
     }
 
     @Nullable

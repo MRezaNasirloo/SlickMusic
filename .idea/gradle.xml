@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$/data" />
             <option value="$PROJECT_DIR$/domain" />
             <option value="$PROJECT_DIR$/domain-implementation" />
+            <option value="$PROJECT_DIR$/favorite" />
             <option value="$PROJECT_DIR$/presentation" />
             <option value="$PROJECT_DIR$/tag-editor" />
           </set>

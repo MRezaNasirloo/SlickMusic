@@ -2,6 +2,7 @@ package com.mrezanasirloo.slickmusic.presentation.ui.song
 
 import android.util.Log
 import com.mrezanasirloo.domain.implementation.model.Song
+import com.mrezanasirloo.domain.implementation.repository.RepoFavorite
 import com.mrezanasirloo.domain.implementation.usecase.UseCaseAddSongToQueueImpl
 import com.mrezanasirloo.domain.implementation.usecase.UseCaseGetAllSongImpl
 import com.mrezanasirloo.domain.implementation.usecase.UseCasePlaySongsImpl
@@ -23,6 +24,7 @@ class PresenterSong @Inject constructor(
         private val getAllSongs: UseCaseGetAllSongImpl,
         private val playSongs: UseCasePlaySongsImpl,
         private val addSongToQueue: UseCaseAddSongToQueueImpl,
+        private val repoFavorite: RepoFavorite,
         @Named("main") main: Scheduler,
         @Named("io") io: Scheduler
 ) : SlickPresenterUni<ViewSong, StateSong>(main, io) {
@@ -38,6 +40,12 @@ class PresenterSong @Inject constructor(
         @Suppress("RedundantSamConstructor")
         val play: Observable<PartialViewState<StateSong>> = command { view -> view.playSongs() }
                 .flatMap { playSongs.execute(listOf(it.toSongDomain())).toObservable<Any>() }
+                .map(Function<Any, PartialViewState<StateSong>> { NoOp() })
+                .onErrorReturn { PartialStateError(it) }
+
+        @Suppress("RedundantSamConstructor")
+        val addFavorite: Observable<PartialViewState<StateSong>> = command { view -> view.addToFavorite() }
+                .flatMap { repoFavorite.insertAll(it.toSongDomain()).toObservable<Any>().subscribeOn(io) }
                 .map(Function<Any, PartialViewState<StateSong>> { NoOp() })
                 .onErrorReturn { PartialStateError(it) }
 
@@ -65,7 +73,7 @@ class PresenterSong @Inject constructor(
                 .map { NoOp() }
 
 
-        scan(StateSong(), merge(list, play, add, search, searchClose))
+        scan(StateSong(), merge(list, play, add, search, searchClose, addFavorite))
                 .doOnComplete { Log.d(TAG, "onComplete() called") }
                 .subscribe(this)
     }
