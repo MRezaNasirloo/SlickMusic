@@ -14,6 +14,7 @@ interface ViewSong {
     fun playSongs(): Observable<Song>
     fun search(): Observable<String>
     fun searchClose(): Observable<Any>
+    fun trigger(): Observable<Any>
     fun addToFavorite(): Observable<Song>
     fun addSongToQueue(): Observable<Collection<Song>>
 }

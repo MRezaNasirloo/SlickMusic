@@ -1,6 +1,8 @@
 package com.mrezanasirloo.slickmusic.presentation.ui.song
 
 
+import android.media.MediaScannerConnection
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.DividerItemDecoration
@@ -24,6 +26,7 @@ import com.xwray.groupie.kotlinandroidextensions.ViewHolder
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_song.*
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -34,6 +37,10 @@ import javax.inject.Provider
  * playSongCallback an instance of this fragment.
  */
 class FragmentSong : BackStackFragment(), ViewSong {
+    override fun trigger(): Observable<Any> {
+        return trigger
+    }
+
     override fun addToFavorite(): Observable<Song> {
         return add
     }
@@ -60,6 +67,7 @@ class FragmentSong : BackStackFragment(), ViewSong {
     lateinit var presenterPlay: PresenterSong
     private val add = PublishSubject.create<Song>()
     private val playSongCallback = PublishSubject.create<Song>()
+    private val trigger = PublishSubject.create<Any>()
     private val searchCallback = PublishSubject.create<String>()
     private val searchCloseCallback = PublishSubject.create<Any>()
     private val addSongToQueue = PublishSubject.create<Collection<Song>>()
@@ -103,6 +111,15 @@ class FragmentSong : BackStackFragment(), ViewSong {
                             R.id.action_add_to_favorite -> {
                                 add.onNext((item as ItemSongSmall).song)
                                 FragmentFavorite.onAddListener.onNext(1)
+                                return@setOnMenuItemClickListener true
+                            }
+                            R.id.action_delete -> {
+                                File((item as ItemSongSmall).song.data).delete()
+                                MediaScannerConnection.scanFile(context?.applicationContext, listOf(item.song.data).toTypedArray(), null, object : MediaScannerConnection.OnScanCompletedListener {
+                                    override fun onScanCompleted(path: String?, uri: Uri?) {
+                                        trigger.onNext(1)
+                                    }
+                                })
                                 return@setOnMenuItemClickListener true
                             }
                             else -> return@setOnMenuItemClickListener false

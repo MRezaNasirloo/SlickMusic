@@ -31,14 +31,6 @@ class PresenterFavorite @Inject constructor(
         @Named("io") io: Scheduler
 ) : SlickPresenterUni<ViewFavorite, StateFavorite>(main, io) {
     override fun start(viewSong: ViewFavorite) {
-
-        @Suppress("RedundantSamConstructor")
-        val list: Observable<PartialViewState<StateFavorite>> = repoFavorite.all().subscribeOn(io)
-                .map { Observable.fromIterable(it).map { Song(it) }.map { ItemSongSmall(it) }.toList().blockingGet() }
-                .map(Function<List<Item>, PartialViewState<StateFavorite>> { PartialStateListFavorite(it) })
-                .startWith(PartialStateEmptyListFavorite())
-                .onErrorReturn { PartialStateErrorFavorite(it) }
-
         @Suppress("RedundantSamConstructor")
         val deleteFav: Observable<PartialViewState<StateFavorite>> = command { v -> v.removeFromFavorite() }
                 .flatMap { repoFavorite.delete(it.toSongDomain()).subscribeOn(io).toObservable<Any>() }
@@ -49,10 +41,15 @@ class PresenterFavorite @Inject constructor(
                 .onErrorReturn { PartialStateErrorFavorite(it) }
 
         @Suppress("RedundantSamConstructor")
-        val load: Observable<PartialViewState<StateFavorite>> = command { v -> v.triggerLoad() }
-                .flatMap { repoFavorite.all().subscribeOn(io) }
-                .map { Observable.fromIterable(it).map { Song(it) }.map { ItemSongSmall(it) }.toList().blockingGet() }
-                .map(Function<List<Item>, PartialViewState<StateFavorite>> { PartialStateListFavorite(it) })
+        val load: Observable<PartialViewState<StateFavorite>> = command { v ->
+            v.triggerLoad().startWith(1).flatMap {
+                repoFavorite.all().subscribeOn(io)
+                        .map { Observable.fromIterable(it).map { Song(it) }.map { ItemSongSmall(it) }.toList().blockingGet() }
+                        .map(Function<List<Item>, PartialViewState<StateFavorite>> { PartialStateListFavorite(it) })
+                        .onErrorReturn { PartialStateErrorFavorite(it) }
+            }
+                    .onErrorReturn { PartialStateErrorFavorite(it) }
+        }
                 .onErrorReturn { PartialStateErrorFavorite(it) }
 
         @Suppress("RedundantSamConstructor")
@@ -68,7 +65,7 @@ class PresenterFavorite @Inject constructor(
                 .map { NoOpFavorite() }
 
 
-        scan(StateFavorite(), merge(list, play, addToQueue, deleteFav, load))
+        scan(StateFavorite(), merge(play, addToQueue, deleteFav, load))
                 .doOnComplete { Log.d(TAG, "onComplete() called") }
                 .subscribe(this)
     }

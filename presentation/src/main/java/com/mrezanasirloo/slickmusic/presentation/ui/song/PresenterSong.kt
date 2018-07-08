@@ -31,11 +31,15 @@ class PresenterSong @Inject constructor(
     override fun start(viewSong: ViewSong) {
 
         @Suppress("RedundantSamConstructor")
-        val list: Observable<PartialViewState<StateSong>> = getAllSongs.execute(Unit).subscribeOn(io)
-                .map { Observable.fromIterable(it).map { Song(it) }.map { ItemSongSmall(it) }.toList().blockingGet() }
-                .map(Function<List<Item>, PartialViewState<StateSong>> { PartialStateList(it) })
-                .startWith(PartialStateEmptyList())
-                .onErrorReturn { PartialStateError(it) }
+        val list: Observable<PartialViewState<StateSong>> = command { v ->
+            viewSong.trigger().startWith(1).flatMap {
+                getAllSongs.execute(Unit).subscribeOn(io)
+                        .map { Observable.fromIterable(it).map { Song(it) }.map { ItemSongSmall(it) }.toList().blockingGet() }
+                        .map(Function<List<Item>, PartialViewState<StateSong>> { PartialStateList(it) })
+                        .startWith(PartialStateEmptyList())
+                        .onErrorReturn { PartialStateError(it) }
+            }.onErrorReturn { PartialStateError(it) }
+        }
 
         @Suppress("RedundantSamConstructor")
         val play: Observable<PartialViewState<StateSong>> = command { view -> view.playSongs() }
@@ -44,10 +48,13 @@ class PresenterSong @Inject constructor(
                 .onErrorReturn { PartialStateError(it) }
 
         @Suppress("RedundantSamConstructor")
-        val addFavorite: Observable<PartialViewState<StateSong>> = command { view -> view.addToFavorite() }
-                .flatMap { repoFavorite.insertAll(it.toSongDomain()).toObservable<Any>().subscribeOn(io) }
-                .map(Function<Any, PartialViewState<StateSong>> { NoOp() })
-                .onErrorReturn { PartialStateError(it) }
+        val addFavorite: Observable<PartialViewState<StateSong>> = command { view ->
+            view.addToFavorite().flatMap {
+                repoFavorite.insertAll(it.toSongDomain()).toObservable<Any>().subscribeOn(io)
+                        .map(Function<Any, PartialViewState<StateSong>> { NoOp() })
+                        .onErrorReturn { PartialStateError(it) }
+            }.onErrorReturn { PartialStateError(it) }
+        }.onErrorReturn { PartialStateError(it) }
 
         @Suppress("RedundantSamConstructor")
         val search: Observable<PartialViewState<StateSong>> = command { view -> view.search() }
